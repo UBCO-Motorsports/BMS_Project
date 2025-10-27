@@ -1,0 +1,109 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#include <Arduino.h>
+
+// BMS Stack Configuration
+#define NUM_BQ79616_DEVICES 2
+#define TOTAL_BQ_DEVICES (NUM_BQ79616_DEVICES + 1) 
+#define CELLS_PER_SLAVE 16 
+#define TEMP_SENSORS_PER_SLAVE 8 
+
+// Teensy 4.0/4.1 Pin Definitions
+#define BQ_UART_SERIAL Serial5 
+#define BQ_UART_BAUDRATE 1000000 
+#define BQ_UART_WAKE_PIN 20 // TX Pin of Serial5 (Teensy 4.0/4.1 Pin 20 is TX5)
+
+// Fault and Control Pins
+#define NFAULT_PIN 19       
+#define AMS_FAULT_PIN 6     
+#define RESET_PIN 10        
+#define FAN_PIN 7        
+#define IMD_STATUS_PIN 5     
+#define POS_AIR_STATUS_PIN 9 
+#define NEG_AIR_STATUS_PIN 8 
+#define IMD_ERROR_PIN 15     
+#define AMS_ERROR_PIN 14     
+
+// CAN Bus Configuration
+#define CAN_BAUDRATE 500000 
+#define CAN_ID_BMS_STATUS       0x6B0 
+#define CAN_ID_BMS_FAULTS       0x6B2 
+#define CAN_ID_CELL_TEMPS_BASE  0x6C0 
+#define CAN_ID_CELL_VOLTS_BASE  0x6D0 
+#define CAN_MSGS_PER_MODULE_VOLTS ((CELLS_PER_SLAVE + 3) / 4) 
+#define CAN_MSGS_PER_MODULE_TEMPS ((TEMP_SENSORS_PER_SLAVE + 3) / 4)
+
+// Timing Constants
+#define WAKE_PING_DURATION_US 2750      
+#define BQ79600_WAKE_TO_ACTIVE_US 3500  
+#define BQ79616_WAKE_TONE_DURATION_US 1600 
+#define BQ79616_SHUTDOWN_TO_ACTIVE_US 10000 
+#define STACK_WAKE_PROPAGATION_DELAY_US ((BQ79616_WAKE_TONE_DURATION_US + BQ79616_SHUTDOWN_TO_ACTIVE_US) * NUM_BQ79616_DEVICES) 
+#define UART_TX_DELAY_US 1
+#define SERIAL_TIMEOUT_MS 100 
+#define STATE_MACHINE_INTERVAL_MS 200
+#define CAN_TRANSMIT_INTERVAL_MS 100 
+
+// Fault Confirmation Delays
+#define COMM_FAULT_CONFIRMATION_MS 500
+#define VOLTAGE_FAULT_CONFIRMATION_MS 200
+#define TEMPERATURE_FAULT_CONFIRMATION_MS 1000
+#define NFAULT_PIN_ASSERTION_TIMEOUT_MS 500
+
+// Safety Thresholds
+#define MAX_CELL_VOLTAGE_MV 4200
+#define MIN_CELL_VOLTAGE_MV  3000
+#define MAX_CELL_TEMP_C 55
+#define MIN_CELL_TEMP_C -1
+#define MAX_BQ_DIE_TEMP_C 85
+#define OV_HYSTERESIS_MV 200
+#define UV_HYSTERESIS_MV 200
+#define TEMP_OPEN_CIRCUIT -8888
+#define TEMP_SHORT_CIRCUIT -9999
+#define TEMP_READ_ERROR -7777
+
+// Cell Balancing Configuration
+#define CELL_BALANCE_VOLTAGE_DIFF_THRESHOLD_MV 20
+#define MAX_VOLTAGE_FOR_BALANCING_MV 4150
+#define MIN_VOLTAGE_FOR_BALANCING_MV 3300
+#define TARGET_BALANCED_VOLTAGE_DIFF_MV 10
+#define NUM_CELLS_TO_BALANCE_SIMULTANEOUSLY_PER_MODULE 2
+#define BALANCING_DURATION_CODE 0x01 // For 10s ON if BAL_CTRL1 DUTY[2:0] = 001b
+
+// Heartbeat Configuration (for BQ79616 devices)
+#define BQ79616_DEV_CONF_HB_EN_MASK 0x01
+#define BQ79616_DEV_CONF_HB_PERIOD_100MS 0x02 
+#define BQ79616_HEARTBEAT_CONFIG (BQ79616_DEV_CONF_HB_EN_MASK | BQ79616_DEV_CONF_HB_PERIOD_100MS)
+
+// NTC Thermistor Configuration
+#define NTC_R_DIVIDER 10000.0f 
+#define NTC_R_REF 10000.0f     
+#define NTC_V_TSREF 5.0f       
+#define NTC_A1 0.001129148f
+#define NTC_B1 0.000234125f
+#define NTC_C1 0.0000000876741f 
+#define NTC_D1 0.0f            
+
+// SOC Estimation Configuration
+#define SOC_VOLTAGE_POINTS 5 
+const float SOC_LOOKUP_VOLTAGES_MV[SOC_VOLTAGE_POINTS] = {3000.0f, 3300.0f, 3700.0f, 4000.0f, 4200.0f};
+const float SOC_LOOKUP_PERCENTAGES[SOC_VOLTAGE_POINTS] = {0.0f, 10.0f, 50.0f, 90.0f, 100.0f};
+
+// FAULT_SUMMARY Register Bit Masks (for BQ79616 FAULT_SUMMARY Register 0x333)
+#define BQ79616_FSUM_FAULT_OTP_MASK         (1 << 0)
+#define BQ79616_FSUM_FAULT_SYS_MASK         (1 << 1)
+#define BQ79616_FSUM_FAULT_PROT_MASK        (1 << 2)
+#define BQ79616_FSUM_FAULT_COMM_MASK        (1 << 3)
+#define BQ79616_FSUM_FAULT_CELL_REG_MASK    (1 << 4)
+#define BQ79616_FSUM_FAULT_GPIO_REG_MASK    (1 << 5)
+#define BQ79616_FSUM_FAULT_BALANCE_MASK     (1 << 6)
+#define BQ79616_FSUM_FAULT_TSENSE_MASK      (1 << 7)
+
+
+// Enable debug serial prints
+#define BMS_DEBUG_PRINTLN(x) Serial.println(x)
+#define BMS_DEBUG_PRINT(x) Serial.print(x)
+#define BMS_DEBUG_PRINTF(...) Serial.printf(__VA_ARGS__)
+
+#endif // CONFIG_H
