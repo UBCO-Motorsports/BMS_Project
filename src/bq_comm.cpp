@@ -77,50 +77,64 @@ BMSErrorCode_t receiveFrame(uint8_t *buffer, size_t expected_length, uint32_t ti
     return BMS_OK;
 }
 
-BMSErrorCode_t buildAndSendFrame(uint8_t deviceID, uint16_t regAddr, const uint8_t *data, uint8_t dataLen, uint8_t frameType) {
+BMSErrorCode_t buildAndSendFrame(uint8_t deviceID, uint16_t regAddr,
+                                 const uint8_t *data, uint8_t dataLen,
+                                 uint8_t frameType) {
     uint8_t frame[MAX_COMMAND_FRAME_SIZE];
-    size_t frameIndex = 0;
+    size_t idx = 0;
+    //new logic handling of frameType
+    bool isSingle = (frameType == FRMWRT_SGL_R || frameType == FRMWRT_SGL_W);
+    bool isWrite = (frameType == FRMWRT_SGL_W || 
+                    frameType == FRMWRT_STK_W ||
+                    frameType == FRMWRT_ALL_W ||
+                    frameType == FRMWRT_REV_ALL_W);
+    bool isReverse = (frameType == FRMWRT_REV_ALL_W);
+    bool isRead = (frameType == FRMWRT_SGL_R ||
+                   frameType == FRMWRT_STK_R ||
+                   frameType == FRMWRT_ALL_R);
 
-    uint8_t initByte = 0x80 | (frameType & 0x70); 
-    if ((frameType & 0x10) || (frameType == FRMWRT_REV_ALL_W) ) { 
-        if (dataLen > 0 && dataLen <= MAX_WRITE_DATA_BYTES) {
-            initByte |= (dataLen - 1) & 0x07; 
-        } else if (dataLen == 0) { 
-            initByte |= 0x00; 
+    //Build command byte
+    uint8_t cmd;
+
+    if (isReverse) {
+        // Reverse broadcast write command format: 0b111xxxxx (0xE0+len)
+        cmd = 0xE0 | ((dataLen - 1) & 0x07);
+    } else {
+        cmd = 0x80 | (frameType & 0x70); // normal cmd byte format
+        if (isWrite) cmd |= ((dataLen - 1) & 0x07);
+    }
+
+    frame[idx++] = cmd;
+
+    // Single-device: include device ID
+    if (isSingle) {
+        frame[idx++] = deviceID;
+    }
+
+    // Register address
+    frame[idx++] = (regAddr >> 8) & 0xFF;
+    frame[idx++] = regAddr & 0xFF;
+
+    // Read: append length-1 byte (only for read)
+    if (isRead) {
+        frame[idx++] = dataLen - 1;
+    }
+
+    // Write: append payload
+    if (isWrite && dataLen > 0 && data != nullptr) {
+        for (uint8_t i = 0; i < dataLen; i++) {
+            frame[idx++] = data[i];
         }
-        if (frameType == FRMWRT_REV_ALL_W) initByte = FRMWRT_REV_ALL_W;
-    }
-    frame[frameIndex++] = initByte;
-
-    if (frameType == FRMWRT_SGL_R || frameType == FRMWRT_SGL_W) {
-        frame[frameIndex++] = deviceID;
     }
 
-    frame[frameIndex++] = (regAddr >> 8) & 0xFF;
-    frame[frameIndex++] = regAddr & 0xFF;
-
-    if (frameType == FRMWRT_SGL_R || frameType == FRMWRT_STK_R || frameType == FRMWRT_ALL_R) {
-        if (dataLen == 0 || dataLen > MAX_READ_DATA_BYTES) return BMS_ERROR_INVALID_RESPONSE; 
-        frame[frameIndex++] = dataLen -1; 
-    } else if ((frameType & 0x10) || (frameType == FRMWRT_REV_ALL_W)) { 
-        if (data != nullptr && dataLen > 0) {
-            for (uint8_t i = 0; i < dataLen; ++i) {
-                if (frameIndex < MAX_COMMAND_FRAME_SIZE - 2) { 
-                    frame[frameIndex++] = data[i];
-                } else {
-                    Serial.println("Error: Command frame buffer overflow during build.");
-                    return BMS_ERROR_UNKNOWN; 
-                }
-            }
-        }
-    }
-    
-    uint16_t crc = calculateCRC16(frame, frameIndex);
-    frame[frameIndex++] = crc & 0xFF;        
-    frame[frameIndex++] = (crc >> 8) & 0xFF; 
-
-    return sendFrame(frame, frameIndex);
+    // CRC16
+    uint16_t crc = calculateCRC16(frame, idx);
+    frame[idx++] = crc & 0xFF;
+    frame[idx++] = crc >> 8;
+    //return frame
+    return sendFrame(frame, idx);
 }
+
 
 BMSErrorCode_t bqWriteReg(uint8_t deviceID, uint16_t regAddr, uint64_t data, uint8_t numBytes, uint8_t frameType) {
     if (numBytes == 0 || numBytes > MAX_WRITE_DATA_BYTES) {
@@ -347,7 +361,7 @@ BMSErrorCode_t bqAutoAddressStack() {
     
     // and then allow them to auto-addresss... (step 4 in datasheet)
     Serial.println("  Enable auto-address mode...");
-    status = bqBroadcastWrite(CONTROL1, 0x01, 1); // Set ADDR_WR bit (TODO: Add datasheet reference)
+    status = bqBroadcastWrite(CONTROL1, 0x01, 1); // Set ADDR_WR bit (TODO: Add datasheet reference) 
     if (status != BMS_OK) { Serial.println("Enable auto-address mode failed"); return status; }
 
 
@@ -357,7 +371,7 @@ BMSErrorCode_t bqAutoAddressStack() {
     // step 5
     Serial.println("  Setting device addresses...");
     for (uint8_t i = 0; i < TOTAL_BQ_DEVICES; ++i) { // Bridge (0) + segments (1 to N)
-        status = bqBroadcastWrite(DIR0_ADDR, i, 1); 
+        status = bqBroadcastWriteReverse(DIR0_ADDR, i, 1); 
         if (status != BMS_OK) { BMS_DEBUG_PRINTF("Setting address %d failed\n", i); return status; }
     }
 
