@@ -172,45 +172,37 @@ void action_startup() {
     bqShutdownDevices(); // Ensure all devices are in shutdown state before startup
     delay(100); // Allow devices to settle after shutdown
 
-    // The following steps are based on the BQ79616 Daisy Chain Startup Sequence on page 27 of the datasheet.
-        
-    // 1. MCU sends WAKE ping to BQ79600-Q1.
-    Serial.println("[1] Waking up BQ79600 bridge...");
+    // The following 2 sections are based on the BQ7961X Daisy Chain Startup Sequence on page 28 of the BQ79600 datasheet (TABLE 7-10 not 7-9 as our current architecture follows BQ79600 COMH ------> COML BQ79616 COMH ------> COML BQ79616 COMH ...)
+
+    /* ------------------------------------------------------------------ */
+    /* [1] WAKE ping                    (Steps 1-3)                       */
+    /* ------------------------------------------------------------------ */
+    Serial.println("[1] Waking up BQ79600 bridge and BQ79616 stack...");
     status = bqWakePing();
-    if (status != BMS_OK) { g_bmsData.communicationFault = true; Serial.println("Startup Error: Bridge wakeup failed."); return; }
+    if (status != BMS_OK) { g_bmsData.communicationFault = true; Serial.println("Startup Error: Bridge or stack wakeup failed."); return; }
     delayMicroseconds(10); 
 
-    // 2. Single device write to BQ79600-Q1 CONTROL1 [SEND_WAKE] = 1 (wake up stack devices)
-    //    (BQ79600 CONTROL1 is 0x0309, SEND_WAKE is bit 5)
-    // TODO: Does BQWakeUpStack() not already do this? -- in which case, why isn't it being used?
-    // ansewr to all of above: no, not anymore, thats now aprt of the bqWakePing() function
-
-    Serial.println("[2] Commanding bridge to wake up BQ79616 stack..."); //I am leaving this here because I don't want to renumber the steps
-
-    // this does nothing (can remove in a code clean eventually)
-    //status = bqWakeUpStack();
-    //if (status != BMS_OK) { g_bmsData.communicationFault = true; Serial.println("Startup Error: Stack wakeup failed."); return; }
-    //delayMicroseconds(10); 
-
     /* ------------------------------------------------------------------ */
-    /* [3] Auto Addressing                                                */
+    /* [2] Auto Addressing              (Steps 4-14)                       */
     /* ------------------------------------------------------------------ */
-    Serial.println("[3] Auto Addressing...");
-    status = bqAutoAddressStack();
+    Serial.println("[2] Auto Addressing...");
+    status = bqAutoAddressStack(); 
     if (status != BMS_OK) { g_bmsData.communicationFault = true;
-        Serial.println("[3] Startup Error: Stack autoaddress failed."); return; }
+        Serial.println("[2] Startup Error: Stack autoaddress failed."); return; }
     delayMicroseconds(10);
 
+    //UBCO Motorsports Debugging has only occurred above this line in the Wake and Autoaddressing parts has not been looked at properly
+    //The only edits have been to change the numbers of each step (since we deleted #3 we changed 5-->4 and 4-->3)
 
     // -----------------------------------------------------------------------------------------------------------
     // all the stuff above this, I think there is already a function for. I need to compare the two but will do it later
     // -----------------------------------------------------------------------------------------------------------
 
-    // 4. Set Registers (Detailed BQ79616 Configurations)
+    // 3. Set Registers (Detailed BQ79616 Configurations)
     // TODO: I think this should end up either refactored or rewritten to be more readable. 
     // This is one of those things I want to be able to change one day (and probably evaluate how our .h files are set up)
 
-    Serial.println("[4] Configuring Stack...");
+    Serial.println("[3] Configuring Stack...");
     // status = bqConfigureStackForHeartbeat(); 
     // if (status != BMS_OK) { g_bmsData.communicationFault = true; Serial.println("Startup Error (Daisy S4): Stack heartbeat config failed."); return; }
 
@@ -227,8 +219,8 @@ void action_startup() {
     // // REMOVE THIS BEFORE EVER ALLOWING THIS TO CONNECT TO ACTUAL CELLS
 
 
-    // 5. Final Fault Reset
-    Serial.println("[5] Resetting all BQ device faults post-configuration...");
+    // 4. Final Fault Reset
+    Serial.println("[4] Resetting all BQ device faults post-configuration...");
     status = resetAllBQFaults(); 
     if (status != BMS_OK) {
         Serial.println("Startup Warning [5]: Failed to reset BQ faults post-configuration.");
