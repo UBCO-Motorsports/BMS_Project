@@ -1,0 +1,3 @@
+##BMS Firmware Debugging Overview
+
+This project focuses on fixing communication issues between the BQ79600 bridge and the daisy-chained BQ79616 battery monitoring ICs in our FSAE BMS. The root cause was incorrect auto-addressing and communication direction handling based on TI Datasheet Table 7-10. The original firmware only enabled auto-addressing (ADDR_WR) but never set DIR_SEL or used reverse broadcast writes, preventing messages from propagating past the first BQ79616. Our debugging work corrects the initialization sequence, ensures proper upstream/downstream communication, and enables address assignment and data forwarding across the full monitoring stack.
