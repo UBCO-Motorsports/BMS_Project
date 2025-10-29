@@ -188,7 +188,7 @@ BMSErrorCode_t bqReadReg(uint8_t deviceID, uint16_t regAddr, uint8_t *readBuffer
 }
 
 BMSErrorCode_t bqBroadcastWrite(uint16_t regAddr, uint64_t data, uint8_t numBytes) {
-    return bqWriteReg(0, regAddr, data, numBytes, FRMWRT_ALL_W); 
+    return bqWriteReg(BQ79600_BRIDGE_DEVICE_ID, regAddr, data, numBytes, FRMWRT_ALL_W); 
 }
 
 BMSErrorCode_t bqBroadcastRead(uint16_t regAddr, uint8_t *readBuffer, uint8_t numBytesToRead, uint32_t timeout_ms /* = SERIAL_TIMEOUT_MS * TOTAL_BQ_DEVICES */)
@@ -314,14 +314,14 @@ BMSErrorCode_t bqStackRead(uint16_t regAddr, uint8_t *readBuffer, uint8_t numByt
 }
 
 BMSErrorCode_t bqBroadcastWriteReverse(uint16_t regAddr, uint64_t data, uint8_t numBytes) {
-    return bqWriteReg(0, regAddr, data, numBytes, FRMWRT_REV_ALL_W);
+    return bqWriteReg(BQ79600_BRIDGE_DEVICE_ID, regAddr, data, numBytes, FRMWRT_REV_ALL_W);
 }
 
 // This function is used to wake up the BQ79600 bridge device and the BQ79616 stack devices. It is *only* meant to be called during startup either during initialization or after an error. 
 // you should probably call a shutdown commands before this one; I won't enforce it here now, but maybe later on if it makes sense. 
 BMSErrorCode_t bqWakePing() {
 BMSErrorCode_t status;
-    //step 1
+    //7-9: Step 1       7-10: Step 1
     Serial.println("Waking up BQ79600 bridge...");
     if (BQ_UART_SERIAL) BQ_UART_SERIAL.end(); // If Serial 5 is active, then end it 
     delay(1);
@@ -336,8 +336,8 @@ BMSErrorCode_t status;
 
     delayMicroseconds(BQ79600_WAKE_TO_ACTIVE_US); 
 
-    //step 2 (NEW and needed for reverse)
-    
+    //7-10 ONLY: Step 2 (COMMENT OUT IF USING 7-9)
+    /*
     status = bqWriteReg(BQ79600_BRIDGE_DEVICE_ID, BQ79600_CONTROL1, 0x80, 1, FRMWRT_SGL_W);   // DIR_SEL (bit 7) = 1
     if (status != BMS_OK) {
         Serial.println("Failed to send DIR_SEL command to bridge.");
@@ -345,8 +345,9 @@ BMSErrorCode_t status;
     }
     delayMicroseconds(BQ79600_WAKE_TO_ACTIVE_US); 
     Serial.println("BQ79600 DIR_SEL command sent.");
+    */
 
-    //step 3
+    //7-9: Step 2       7-10: Step 3
     status = bqWriteReg(BQ79600_BRIDGE_DEVICE_ID, BQ79600_CONTROL1, 0x20, 1, FRMWRT_SGL_W);   // SEND_WAKE (bit 5) = 1
     if (status != BMS_OK) {
         Serial.println("Failed to send WAKE_STACK command to bridge.");
@@ -362,9 +363,8 @@ BMSErrorCode_t status;
 BMSErrorCode_t bqAutoAddressStack() {
     Serial.println("Starting auto-addressing sequence...");
     BMSErrorCode_t status;
-    //step 4
-    // we undergo the "dummy writes" to synchronize the DLL -- this is important if the stack is coming up from complete, dark shutdown. 
-    // The original code did something werid with this; i don't care to dig into it much though since the actual implementation seems to mirror this one.
+    //7-9: Step 3       7-10: Step 4 
+    // we undergo the "dummy writes or dummy reads" to synchronize the DLL -- this is important if the stack is coming up from complete, dark shutdown. 
     Serial.println("DLL Sync (dummy writes)...");
     // we write to each of the ECC registers 1-8
     for (uint16_t reg = OTP_ECC_DATAIN1; reg <= OTP_ECC_DATAIN8; ++reg) { 
@@ -372,43 +372,60 @@ BMSErrorCode_t bqAutoAddressStack() {
         if (status != BMS_OK) { BMS_DEBUG_PRINTF("DLL Sync Write failed for reg 0x%X\n", reg); return status; }
     }
     
-
-    //step 5
+    //7-10 ONLY: Step 5 (COMMENT OUT IF USING 7-9)
+    /*
     Serial.println("Change stack device directions");
     status = bqBroadcastWriteReverse(CONTROL1, 0x80, 1); //write 0x80 (DIR_SEL bit to 1) to CONTROL1
     if (status != BMS_OK) { Serial.println("Reverse stack direction failed"); return status; }
+    */
 
-    //step 6
+    //7-10 ONLY: Step 6 (COMMENT OUT IF USING 7-9 - side note: this same command is called later in 7-9 and 7-10(again) but don't do it now for 7-9)
+    /*
     Serial.println("Write to COMM_CTRL"); 
     status = bqBroadcastWrite(COMM_CTRL, 0x02, 1); //needed after direction reversal to reset top stack device to prevent faults
     if (status != BMS_OK) { Serial.println("Write to COMM_CTRL failed"); return status; }
+    */
 
-    //step 7
+    //7-10 ONLY: Step 7 (COMMENT OUT IF USING 7-9 AND USE THE ONE BELOW)
+    /*
     Serial.println("Enable auto-adress mode..."); 
-    status = bqBroadcastWrite(CONTROL1, 0x81, 1); // Set ADDR_WR and DIR_SEL bits in CONTROL1
+    status = bqBroadcastWrite(CONTROL1, 0x81, 1); // Set ADDR_WR and DIR_SEL bits in CONTROL1 to 1
+    if (status != BMS_OK) { Serial.println("Enable auto-address mode failed"); return status; }
+    */
+
+    //7-9 ONLY: Step 4 (COMMENT OUT IF USING 7-10 AND USE THE ONE ABOVE)
+    Serial.println("Enable auto-adress mode..."); 
+    status = bqBroadcastWrite(CONTROL1, 0x01, 1); // Set ADDR_WR bit in CONTROL1 to 1
     if (status != BMS_OK) { Serial.println("Enable auto-address mode failed"); return status; }
 
-    //step 8
+    //7-10 ONLY: Step 8 (COMMENT OUT IF USING 7-9 AND USE THE ONE BELOW (ALMOST IDENTCIAL CODE BUT ADDRESS CHANGES))
+    /*
     Serial.println("  Setting device addresses...");
     for (uint8_t i = 0; i < TOTAL_BQ_DEVICES; ++i) { // Bridge (0) + segments (1 to N) [Make sure TOTAL_BQ_DEVICES is correct]
         status = bqBroadcastWrite(DIR1_ADDR, i, 1);  //write to 0x307
         if (status != BMS_OK) { BMS_DEBUG_PRINTF("Setting address %d failed\n", i); return status; }
     }
+    */
 
-    //step 9
+    //7-9 ONLY: Step 5 (COMMENT OUT IF USING 7-10 AND USE THE ONE ABOVE)
+    Serial.println("  Setting device addresses...");
+    for (uint8_t i = 0; i < TOTAL_BQ_DEVICES; ++i) { // Bridge (0) + segments (1 to N) [Make sure TOTAL_BQ_DEVICES is correct]
+        status = bqBroadcastWrite(DIR0_ADDR, i, 1);  //write to 0x306
+        if (status != BMS_OK) { BMS_DEBUG_PRINTF("Setting address %d failed\n", i); return status; }
+
+    //7-9: Step 6       7-10: Step 9
     Serial.println("Configure BQ79616s as stack devices...");
     status = bqBroadcastWrite(COMM_CTRL, 0x02, 1); // STACK_DEV=1, TOP_STACK=0 for all BQ79616s
     if (status != BMS_OK) { Serial.println("Configure stack devices failed"); return status; }
 
-    //step 10
+    //7-9: Step 7       7-10: Step 10
     if (NUM_BQ79616_DEVICES > 0) {
         Serial.println("  Configure Top of Stack device..."); //find which device is top of stack and set it
         uint8_t tos_address = NUM_BQ79616_DEVICES; 
         status = bqWriteReg(tos_address, COMM_CTRL, 0x03, 1, FRMWRT_SGL_W); // STACK_DEV=1, TOP_STACK=1
         if (status != BMS_OK) { BMS_DEBUG_PRINTF("Configure ToS device (Addr %d) failed\n", tos_address); return status; }
     }
-
-    //step 11
+    //7-9: Step 8       7-10: Step 11
     Serial.println("  DLL Sync (dummy reads)...");
     uint8_t dummyReadBuf[MAX_READ_DATA_BYTES]; 
     for (uint16_t reg = OTP_ECC_DATAIN1; reg <= OTP_ECC_DATAIN8; ++reg) { 
@@ -419,21 +436,33 @@ BMSErrorCode_t bqAutoAddressStack() {
         }
     }
 
-    //step 12
+    //7-9 ONLY: Step 9 (COMMENT OUT IF USING 7-10 AND USE THE ONE BELOW (ALMOST IDENTCIAL CODE BUT ADDRESS CHANGES))
     Serial.println("  Verifying stack device addresses (DIR0_ADDR)...");
+    uint8_t addrBuf[NUM_BQ79616_DEVICES];                 // one byte per monitor
+    status = bqStackRead(DIR0_ADDR, addrBuf, 1);          // frames come Btm→Top
+    if (status != BMS_OK) {
+        Serial.println("  Address-verification read failed.");
+        return status;                                    // abort auto-address
+    }
+
+    //7-10 ONLY: Step 12 (COMMENT OUT IF USING 7-9 AND USE THE ONE ABOVE (ALMOST IDENTCIAL CODE BUT ADDRESS CHANGES))
+    /*
+    Serial.println("  Verifying stack device addresses (DIR1_ADDR)...");
     uint8_t addrBuf[NUM_BQ79616_DEVICES];                 // one byte per monitor
     status = bqStackRead(DIR1_ADDR, addrBuf, 1);          // frames come Btm→Top
     if (status != BMS_OK) {
         Serial.println("  Address-verification read failed.");
         return status;                                    // abort auto-address
     }
+    */
+
     //print device reports
     for (uint8_t i = 0; i < NUM_BQ79616_DEVICES; ++i) {
         Serial.print("    Dev "); Serial.print(i + 1);
         Serial.print(" reports 0x"); Serial.println(addrBuf[i], HEX);
     }
 
-    //step 13
+    //7-9: Step 10      7-10: Step 13
     Serial.println("  Verifying BQ79600-Q1 DEV_CONF1 (0x2001)...");
     uint8_t devConf1 = 0;
     status = bqReadReg(BQ79600_BRIDGE_DEVICE_ID, 0x2001, &devConf1, 1, FRMWRT_SGL_R);
@@ -453,7 +482,8 @@ BMSErrorCode_t bqAutoAddressStack() {
     if (status != BMS_OK) { Serial.println("Resetting FAULT_RST1 failed"); return status; }
     status = bqBroadcastWrite(FAULT_RST2, 0xFF, 1); // Reset all in FAULT_RST2
     if (status != BMS_OK) { Serial.println("Resetting FAULT_RST2 failed"); return status; }
-    //step 14
+    
+    //7-9: Step 11      7-10: Step 14
     Serial.println("Auto-addressing complete.");
     return BMS_OK;
 }
