@@ -172,19 +172,22 @@ void action_startup() {
     bqShutdownDevices(); // Ensure all devices are in shutdown state before startup
     delay(100); // Allow devices to settle after shutdown
 
-    // The following 2 sections are based on the BQ7961X Daisy Chain Startup Sequence on page 28 of the BQ79600 datasheet (TABLE 7-10 not 7-9 as our current architecture follows BQ79600 COMH ------> COML BQ79616 COMH ------> COML BQ79616 COMH ...)
+    // The following 2 sections are based on the BQ7961X Daisy Chain Startup Sequence on page 27 of the BQ79600 datasheet
+    // Look at the diagram between the two tables to find which one matches the architcture. If the architecture ever switches, you MUST go through the code and comment/uncomment necessary lines as marked
 
-    /* ------------------------------------------------------------------ */
-    /* [1] WAKE ping                    (Steps 1-3)                       */
-    /* ------------------------------------------------------------------ */
+    //CURRENTLY FOLLOWING: Table 7-9
+
+    /* ---------------------------------------------------------------------------------------------- */
+    /* [1] WAKE ping                    (Steps 1-3) TABLE 7-10                  (Steps 1-2) Table 7-9 */
+    /* ---------------------------------------------------------------------------------------------- */
     Serial.println("[1] Waking up BQ79600 bridge and BQ79616 stack...");
-    status = bqWakePing();
+    status = bqWakePing(); 
     if (status != BMS_OK) { g_bmsData.communicationFault = true; Serial.println("Startup Error: Bridge or stack wakeup failed."); return; }
     delayMicroseconds(10); 
 
-    /* ------------------------------------------------------------------ */
-    /* [2] Auto Addressing              (Steps 4-14)                       */
-    /* ------------------------------------------------------------------ */
+    /* ------------------------------------------------------------------------------------------------------ */
+    /* [2] Auto-Addressing                    (Steps 4-14) TABLE 7-10                  (Steps 3-11) Table 7-9 */
+    /* ------------------------------------------------------------------------------------------------------ */
     Serial.println("[2] Auto Addressing...");
     status = bqAutoAddressStack(); 
     if (status != BMS_OK) { g_bmsData.communicationFault = true;
