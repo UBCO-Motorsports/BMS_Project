@@ -53,6 +53,14 @@ void bqInitCommunication() {
 
 BMSErrorCode_t sendFrame(const uint8_t *frame, size_t length) {
     BQ_UART_SERIAL.write(frame, length);
+    
+    //hex print of frame for debugging
+    for (size_t i = 0; i < length; i++) {
+    Serial.print(frame[i], HEX);
+    Serial.print(" "); // space between bytes for readability
+    }
+    Serial.println();
+
     BQ_UART_SERIAL.flush(); 
     delayMicroseconds(UART_TX_DELAY_US); 
     return BMS_OK;
