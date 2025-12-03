@@ -23,6 +23,10 @@ BMSErrorCode_t bqStackWrite(uint16_t regAddr, uint64_t data, uint8_t numBytes);
 BMSErrorCode_t bqStackRead(uint16_t regAddr, uint8_t *readBuffer, uint8_t numBytesPerDevice, uint32_t timeout_ms = SERIAL_TIMEOUT_MS * NUM_BQ79616_DEVICES * 2); // Increased timeout multiplier
 BMSErrorCode_t bqBroadcastWriteReverse(uint16_t regAddr, uint64_t data, uint8_t numBytes);
 
+//MUXcontrol
+BMSErrorCode_t bqSetGpioconfig(uint8_t deviceID, uint8_t gpioIndex, uint8_t configValue);
+BMSErrorCode_t bqSetMuxChannel(uint8_t channel);
+
 void bqInitCommunication();
 BMSErrorCode_t bqWakePing();
 BMSErrorCode_t bqWakeUpStack();

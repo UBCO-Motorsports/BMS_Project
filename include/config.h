@@ -14,6 +14,18 @@
 #define BQ_UART_BAUDRATE 1000000 
 #define BQ_UART_WAKE_PIN 20 // TX Pin of Serial5 (Teensy 4.0/4.1 Pin 20 is TX5)
 
+//BQ79616 config for MUX pins
+#define GPIO_OUT_HIGH 0b100
+#define GPIO_OUT_LOW 0b101
+
+//MUX Select Pins 
+#define MUX_S0 = 6
+#define MUX_S1 = 7
+#define MUX_S2 = 8
+
+
+
+
 // Fault and Control Pins
 #define NFAULT_PIN 19       
 #define AMS_FAULT_PIN 6     

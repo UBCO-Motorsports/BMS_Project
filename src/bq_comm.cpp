@@ -25,7 +25,7 @@ BMSErrorCode_t bqAutoAddressStack() {
 
 
     // step 5
-    Serial.println("  Setting device addresses...");
+    Serial.println(" Setting device addresses...");
     for (uint8_t i = 0; i < TOTAL_BQ_DEVICES; ++i) { // Bridge (0) + segments (1 to N)
         status = bqBroadcastWrite(DIR0_ADDR, i, 1); 
         if (status != BMS_OK) { BMS_DEBUG_PRINTF("Setting address %d failed\n", i); return status; }
@@ -108,3 +108,72 @@ BMSErrorCode_t bqAutoAddressStack() {
 }
 
 
+
+// New MUX control 
+
+BMSErrorCode_t bqSetGpioconfig(uint8_t deviceID, uint8_t gpioIndex, uint8_t configValue){
+    uint16_t = conf_reg;
+    uint8_t = conf_val;
+    uint8_t = conf_pos;
+
+
+    // Determine the register and bit position for the 3-bit configuration group
+    if (gpioIndex >= 1 && gpioIndex <= 2) {
+        conf_reg = GPIO_CONF1;
+        bit_pos = (gpioIndex - 1) * 3;
+    } else if (gpioIndex >= 3 && gpioIndex <= 4) {
+        conf_reg = GPIO_CONF2;
+        bit_pos = (gpioIndex - 3) * 3;
+    } else if (gpioIndex >= 5 && gpioIndex <= 6) {
+        conf_reg = GPIO_CONF3;
+        bit_pos = (gpioIndex - 5) * 3;
+    } else if (gpioIndex >= 7 && gpioIndex <= 8) {
+        conf_reg = GPIO_CONF4;
+        // GPIO7 uses bits 5:3, GPIO8 uses bits 2:0
+        if (gpioIndex == 7) bit_pos = 3; 
+        else bit_pos = 0; 
+    } else {
+        BMS_DEBUG_PRINTF("Invalid GPIO index %d for configuration.\n", gpioIndex);
+        return BMS_ERROR_UNKNOWN;
+    }
+
+    // Read current config
+    BMSErrorCode_t status = bqReadReg(deviceID, conf_reg, &conf_val, 1, FRMWRT_SGL_R);
+    if (status != BMS_OK) return status;
+
+    // Clear the existing 3 bits (0b111) and set the new 3 bits
+    conf_val &= ~(0b111 << bit_pos); // Clear bits
+    conf_val |= (configValue << bit_pos); // Set new value
+
+    // Write back new config
+    return bqWriteReg(deviceID, conf_reg, conf_val, 1, FRMWRT_SGL_W);
+}
+
+// New function to set MUX select lines S0, S1, S2 (GPIO6, GPIO7, GPIO8) simultaneously
+BMSErrorCode_t bqSetMuxChannel(uint8_t channel) {
+    // Channel (0-7) maps to S2(bit 2), S1(bit 1), S0(bit 0)
+    // S0 = GPIO6, S1 = GPIO7, S2 = GPIO8
+    uint8_t s0_state_cfg = (channel & 0b001) ? GPIO_OUT_HIGH : GPIO_OUT_LOW;
+    uint8_t s1_state_cfg = (channel & 0b010) ? GPIO_OUT_HIGH : GPIO_OUT_LOW;
+    uint8_t s2_state_cfg = (channel & 0b100) ? GPIO_OUT_HIGH : GPIO_OUT_LOW;
+
+    bool all_ok = true;
+    BMSErrorCode_t status;
+    // Assuming the MUX control pins are physically connected to the first BQ79616 (Device ID 1)
+    uint8_t deviceID = 1; 
+
+    // Set GPIO6 (S0) configuration
+    status = bqSetGpioconfig(deviceID, MUX_S0, s0_state_cfg);
+    if (status != BMS_OK) { all_ok = false; }
+    // Set GPIO7 (S1) configuration
+    status = bqSetGpioconfig(deviceID, MUX_S1, s1_state_cfg);
+    if (status != BMS_OK) { all_ok = false; }
+    // Set GPIO8 (S2) configuration
+    status = bqSetGpioconfig(deviceID, MUX_S2, s2_state_cfg);
+    if (status != BMS_OK) { all_ok = false; }
+    
+    //settle time
+    bqDelayUs(100); 
+
+    return all_ok ? BMS_OK : BMS_ERROR_UNKNOWN;
+}
