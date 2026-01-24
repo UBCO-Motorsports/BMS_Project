@@ -209,11 +209,31 @@ void action_startup() {
     // status = bqConfigureStackForHeartbeat(); 
     // if (status != BMS_OK) { g_bmsData.communicationFault = true; Serial.println("Startup Error (Daisy S4): Stack heartbeat config failed."); return; }
 
+
     // this replaced the pile of gemini code that was here before
     bool retFlag;
     configure_stack(reg_val_8bit, status, retFlag);
-    if (retFlag)
-        return;
+    retFlag = false;
+
+    //Adding the MUX COntrol to the control Stack 
+
+    Serial.println(" Configuring MUX S0/S1/S2 (GPIO6/7/8) as Outputs (Default Low)... for MUX control");
+    
+    // Configure all stack devices with the default state (Output Low)
+    for (uint8_t i = 1; i <= NUM_BQ79616_DEVICES; ++i) {
+        // Configure GPIO6 (S0) as Output Low (0b101)
+        status = bqSetGpioconfig(i, 6, GPIO_OUT_LOW);
+        if (status != BMS_OK) { Serial.printf("MUX GPIO6 (S0) config failed %d\n", i); retFlag = true; return; }
+        // Configure GPIO7 (S1) as Output Low (0b101)
+        status = bqSetGpioconfig(i, 7, GPIO_OUT_LOW);
+        if (status != BMS_OK) { Serial.printf("MUX GPIO7 (S1) config failed %d\n", i); retFlag = true; return; }
+        // Configure GPIO8 (S2) as Output Low (0b101)
+        status = bqSetGpioconfig(i, 8, GPIO_OUT_LOW);
+        if (status != BMS_OK) { Serial.printf("MUX GPIO8 (S2) config failed %d\n", i); retFlag = true; return; }
+    }
+
+    //return
+
 
     // Serial.println("[4.5] Disabling OV/UV and OT/UT faults on all stack devices...");
     // Serial.println("[WARNING!!!!!] THIS IS DANGEROUS! DO NOT USE THIS!");
@@ -566,6 +586,8 @@ FSM_State_t transition_fault_critical() {
     // Default: remain in critical fault
     return FSM_STATE_FAULT_CRITICAL;
 }
+
+
 
 /* Removed unused shutdown/system off functions and all references to them */
 
