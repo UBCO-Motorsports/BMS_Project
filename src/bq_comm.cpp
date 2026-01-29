@@ -1,4 +1,364 @@
 #include "bq_comm.h"
+#include "config.h" 
+#include "B0_reg.h" 
+#include "bq79600_reg.h" 
+
+static const uint16_t crc16_ibm_table[256] = {
+    0x0000, 0xC0C1, 0xC181, 0x0140, 0xC301, 0x03C0, 0x0280, 0xC241,
+    0xC601, 0x06C0, 0x0780, 0xC741, 0x0500, 0xC5C1, 0xC481, 0x0440,
+    0xCC01, 0x0CC0, 0x0D80, 0xCD41, 0x0F00, 0xCFC1, 0xCE81, 0x0E40,
+    0x0A00, 0xCAC1, 0xCB81, 0x0B40, 0xC901, 0x09C0, 0x0880, 0xC841,
+    0xD801, 0x18C0, 0x1980, 0xD941, 0x1B00, 0xDBC1, 0xDA81, 0x1A40,
+    0x1E00, 0xDEC1, 0xDF81, 0x1F40, 0xDD01, 0x1DC0, 0x1C80, 0xDC41,
+    0x1400, 0xD4C1, 0xD581, 0x1540, 0xD701, 0x17C0, 0x1680, 0xD641,
+    0xD201, 0x12C0, 0x1380, 0xD341, 0x1100, 0xD1C1, 0xD081, 0x1040,
+    0xF001, 0x30C0, 0x3180, 0xF141, 0x3300, 0xF3C1, 0xF281, 0x3240,
+    0x3600, 0xF6C1, 0xF781, 0x3740, 0xF501, 0x35C0, 0x3480, 0xF441,
+    0x3C00, 0xFCC1, 0xFD81, 0x3D40, 0xFF01, 0x3FC0, 0x3E80, 0xFE41,
+    0xFA01, 0x3AC0, 0x3B80, 0xFB41, 0x3900, 0xF9C1, 0xF881, 0x3840,
+    0x2800, 0xE8C1, 0xE981, 0x2940, 0xEB01, 0x2BC0, 0x2A80, 0xEA41,
+    0xEE01, 0x2EC0, 0x2F80, 0xEF41, 0x2D00, 0xEDC1, 0xEC81, 0x2C40,
+    0xE401, 0x24C0, 0x2580, 0xE541, 0x2700, 0xE7C1, 0xE681, 0x2640,
+    0x2200, 0xE2C1, 0xE381, 0x2340, 0xE101, 0x21C0, 0x2080, 0xE041,
+    0xA001, 0x60C0, 0x6180, 0xA141, 0x6300, 0xA3C1, 0xA281, 0x6240,
+    0x6600, 0xA6C1, 0xA781, 0x6740, 0xA501, 0x65C0, 0x6480, 0xA441,
+    0x6C00, 0xACC1, 0xAD81, 0x6D40, 0xAF01, 0x6FC0, 0x6E80, 0xAE41,
+    0xAA01, 0x6AC0, 0x6B80, 0xAB41, 0x6900, 0xA9C1, 0xA881, 0x6840,
+    0x7800, 0xB8C1, 0xB981, 0x7940, 0xBB01, 0x7BC0, 0x7A80, 0xBA41,
+    0xBE01, 0x7EC0, 0x7F80, 0xBF41, 0x7D00, 0xBDC1, 0xBC81, 0x7C40,
+    0xB401, 0x74C0, 0x7580, 0xB541, 0x7700, 0xB7C1, 0xB681, 0x7640,
+    0x7200, 0xB2C1, 0xB381, 0x7340, 0xB101, 0x71C0, 0x7080, 0xB041,
+    0x5000, 0x90C1, 0x9181, 0x5140, 0x9301, 0x53C0, 0x5280, 0x9241,
+    0x9601, 0x56C0, 0x5780, 0x9741, 0x5500, 0x95C1, 0x9481, 0x5440,
+    0x9C01, 0x5CC0, 0x5D80, 0x9D41, 0x5F00, 0x9FC1, 0x9E81, 0x5E40,
+    0x5A00, 0x9AC1, 0x9B81, 0x5B40, 0x9901, 0x59C0, 0x5880, 0x9841,
+    0x8801, 0x48C0, 0x4980, 0x8941, 0x4B00, 0x8BC1, 0x8A81, 0x4A40,
+    0x4E00, 0x8EC1, 0x8F81, 0x4F40, 0x8D01, 0x4DC0, 0x4C80, 0x8C41,
+    0x4400, 0x84C1, 0x8581, 0x4540, 0x8701, 0x47C0, 0x4680, 0x8641,
+    0x8201, 0x42C0, 0x4380, 0x8341, 0x4100, 0x81C1, 0x8081, 0x4040
+};
+
+uint16_t calculateCRC16(const uint8_t *data, size_t length) {
+    uint16_t crc = 0xFFFF; 
+    for (size_t i = 0; i < length; ++i) {
+        crc = (crc >> 8) ^ crc16_ibm_table[(crc & 0xFF) ^ data[i]];
+    }
+    return crc;
+}
+
+void bqInitCommunication() {
+    BQ_UART_SERIAL.begin(BQ_UART_BAUDRATE, SERIAL_8N1);
+    BQ_UART_SERIAL.setTimeout(SERIAL_TIMEOUT_MS); 
+}
+
+BMSErrorCode_t sendFrame(const uint8_t *frame, size_t length) {
+    BQ_UART_SERIAL.write(frame, length);
+    BQ_UART_SERIAL.flush(); 
+    delayMicroseconds(UART_TX_DELAY_US); 
+    return BMS_OK;
+}
+
+BMSErrorCode_t receiveFrame(uint8_t *buffer, size_t expected_length, uint32_t timeout_ms) {
+    unsigned long startTime = millis();
+    size_t bytesRead = 0;
+    if (expected_length == 0) return BMS_OK; // Nothing to read
+
+    while (bytesRead < expected_length && (millis() - startTime) < timeout_ms) {
+        if (BQ_UART_SERIAL.available()) {
+            buffer[bytesRead++] = BQ_UART_SERIAL.read();
+        }
+    }
+    if (bytesRead < expected_length) {
+        // BMS_DEBUG_PRINTF("Receive timeout: expected %d, got %d bytes in %lu ms\n", expected_length, bytesRead, millis() - startTime);
+        // Clear remaining buffer from UART to prevent old data carryover
+        while(BQ_UART_SERIAL.available()) BQ_UART_SERIAL.read();
+        return BMS_ERROR_COMM_TIMEOUT;
+    }
+    return BMS_OK;
+}
+
+BMSErrorCode_t buildAndSendFrame(uint8_t deviceID, uint16_t regAddr,
+                                 const uint8_t *data, uint8_t dataLen,
+                                 uint8_t frameType) {
+    uint8_t frame[MAX_COMMAND_FRAME_SIZE];
+    size_t idx = 0;
+    //new logic handling of frameType
+    bool isSingle = (frameType == FRMWRT_SGL_R || frameType == FRMWRT_SGL_W);
+    bool isWrite = (frameType == FRMWRT_SGL_W || 
+                    frameType == FRMWRT_STK_W ||
+                    frameType == FRMWRT_ALL_W ||
+                    frameType == FRMWRT_REV_ALL_W);
+    bool isReverse = (frameType == FRMWRT_REV_ALL_W);
+    bool isRead = (frameType == FRMWRT_SGL_R ||
+                   frameType == FRMWRT_STK_R ||
+                   frameType == FRMWRT_ALL_R);
+
+    //Build command byte
+    uint8_t cmd;
+
+    if (isReverse) {
+        // Reverse broadcast write command format: 0b111xxxxx (0xE0+len)
+        cmd = 0xE0 | ((dataLen - 1) & 0x07);
+    } else {
+        cmd = 0x80 | (frameType & 0x70); // normal cmd byte format
+        if (isWrite) cmd |= ((dataLen - 1) & 0x07);
+    }
+
+    frame[idx++] = cmd;
+
+    // Single-device: include device ID
+    if (isSingle) {
+        frame[idx++] = deviceID;
+    }
+
+    // Register address
+    frame[idx++] = (regAddr >> 8) & 0xFF;
+    frame[idx++] = regAddr & 0xFF;
+
+    // Read: append length-1 byte (only for read)
+    if (isRead) {
+        frame[idx++] = dataLen - 1;
+    }
+
+    // Write: append payload
+    if (isWrite && dataLen > 0 && data != nullptr) {
+        for (uint8_t i = 0; i < dataLen; i++) {
+            frame[idx++] = data[i];
+        }
+    }
+
+    // CRC16
+    uint16_t crc = calculateCRC16(frame, idx);
+    frame[idx++] = crc & 0xFF;
+    frame[idx++] = crc >> 8;
+    //return frame
+    return sendFrame(frame, idx);
+}
+
+
+BMSErrorCode_t bqWriteReg(uint8_t deviceID, uint16_t regAddr, uint64_t data, uint8_t numBytes, uint8_t frameType) {
+    if (numBytes == 0 || numBytes > MAX_WRITE_DATA_BYTES) {
+        return BMS_ERROR_INVALID_RESPONSE; 
+    }
+    uint8_t dataBytes[MAX_WRITE_DATA_BYTES];
+    for (int i = 0; i < numBytes; ++i) {
+        dataBytes[i] = (data >> (8 * (numBytes - 1 - i))) & 0xFF; 
+    }
+    return buildAndSendFrame(deviceID, regAddr, dataBytes, numBytes, frameType);
+}
+
+BMSErrorCode_t bqReadReg(uint8_t deviceID, uint16_t regAddr, uint8_t *readBuffer, uint8_t numBytesToRead, uint8_t frameType, uint32_t timeout_ms) {
+    if (numBytesToRead == 0 || numBytesToRead > MAX_READ_DATA_BYTES) {
+        return BMS_ERROR_INVALID_RESPONSE;
+    }
+
+    BMSErrorCode_t status = buildAndSendFrame(deviceID, regAddr, nullptr, numBytesToRead, frameType);
+    if (status != BMS_OK) return status;
+
+    size_t expectedResponseLength = SINGLE_DEVICE_RESPONSE_OVERHEAD + numBytesToRead;
+    uint8_t responseFrame[MAX_SINGLE_DEVICE_RESPONSE_SIZE]; // Use max possible size for a single response
+    if (expectedResponseLength > MAX_SINGLE_DEVICE_RESPONSE_SIZE) {
+        Serial.println("Error: ReadReg expected response too large for buffer.");
+        return BMS_ERROR_UNKNOWN;
+    }
+    
+    status = receiveFrame(responseFrame, expectedResponseLength, timeout_ms);
+    if (status != BMS_OK) return status;
+
+    uint16_t received_crc = (uint16_t)(responseFrame[expectedResponseLength - 1] << 8) | responseFrame[expectedResponseLength - 2];
+    uint16_t calculated_crc = calculateCRC16(responseFrame, expectedResponseLength - 2);
+    if (received_crc != calculated_crc) {
+        BMS_DEBUG_PRINTF("ReadReg CRC mismatch! Exp: 0x%04X, Got: 0x%04X for Dev %d, Reg 0x%04X\n", calculated_crc, received_crc, deviceID, regAddr);
+        return BMS_ERROR_CRC;
+    }
+
+    // TODO: Verify response INIT byte, Device ID (if applicable), and Register Address
+    if ((responseFrame[0] & 0x80) == 0x80) { // Check if it's a command frame (bit 7 = 1)
+        Serial.println("Error: Expected response frame, got command frame type.");
+        return BMS_ERROR_INVALID_RESPONSE;
+    }
+    if ((frameType == FRMWRT_SGL_R) && (responseFrame[1] != deviceID)) {
+        BMS_DEBUG_PRINTF("Error: Response from wrong device ID. Expected %d, Got %d\n", deviceID, responseFrame[1]);
+        return BMS_ERROR_INVALID_RESPONSE;
+    }
+    // Add more checks for REG_ADDR if needed
+
+    memcpy(readBuffer, &responseFrame[4], numBytesToRead); 
+    return BMS_OK;
+}
+
+BMSErrorCode_t bqBroadcastWrite(uint16_t regAddr, uint64_t data, uint8_t numBytes) {
+    return bqWriteReg(0, regAddr, data, numBytes, FRMWRT_ALL_W); 
+}
+
+BMSErrorCode_t bqBroadcastRead(uint16_t regAddr, uint8_t *readBuffer, uint8_t numBytesToRead, uint32_t timeout_ms /* = SERIAL_TIMEOUT_MS * TOTAL_BQ_DEVICES */)
+{
+    /* ---- argument sanity ---- */
+    if (readBuffer == nullptr ||
+        numBytesToRead == 0 ||
+        numBytesToRead > MAX_READ_DATA_BYTES)
+        return BMS_ERROR_INVALID_RESPONSE;
+#define BMS_DEBUG
+    if (regAddr < 0x0000 || regAddr > 0x3FFF) {
+        Serial.println(F("[BRD_R] Invalid register address"));
+        return BMS_ERROR_INVALID_RESPONSE;
+    }
+#ifdef BMS_DEBUG
+    Serial.print  (F("[BRD_R] reg 0x"));
+    Serial.print  (regAddr, HEX);
+    Serial.print  (F("  len "));
+    Serial.println(numBytesToRead);
+#endif
+
+    /* ---- 1. send the ALL_R command frame ---- */
+    BMSErrorCode_t st = buildAndSendFrame(
+        0, regAddr,
+        nullptr,
+        numBytesToRead,          /* LEN = bytes to read */
+        FRMWRT_ALL_R);           /* broadcast read opcode */
+    if (st != BMS_OK) {
+#ifdef BMS_DEBUG
+        Serial.println(F("[BRD_R] buildAndSendFrame failed"));
+#endif
+        return st;
+    }
+
+    /* ---- 2. receive response frames ---- */
+    constexpr size_t HDR_LEN  = 4;     /* INIT, ADDR, CMD, LEN */
+    constexpr size_t CRC_LEN  = 2;     /* 16-bit CRC           */
+    const     size_t FRAME_LEN  = HDR_LEN + numBytesToRead + CRC_LEN;
+    const     size_t TOTAL_LEN  = FRAME_LEN * TOTAL_BQ_DEVICES;
+
+    uint8_t rxBuf[TOTAL_LEN];
+    st = receiveFrame(rxBuf, TOTAL_LEN, timeout_ms);
+    if (st != BMS_OK) {
+#ifdef BMS_DEBUG
+        Serial.println(F("[BRD_R] receiveFrame timeout / UART error"));
+#endif
+        return st;
+    }
+
+#ifdef BMS_DEBUG
+    Serial.print  (F("[BRD_R] got "));
+    Serial.print  (TOTAL_LEN);
+    Serial.println(F(" bytes"));
+#endif
+
+    /* ---- 3. CRC check + copy data ---- */
+    for (size_t dev = 0; dev < TOTAL_BQ_DEVICES; ++dev) {
+        size_t off = dev * FRAME_LEN;
+
+        uint16_t crc_rx  = (rxBuf[off + FRAME_LEN - 1] << 8) |
+                            rxBuf[off + FRAME_LEN - 2];
+        uint16_t crc_cal = calculateCRC16(&rxBuf[off], FRAME_LEN - CRC_LEN);
+
+#ifdef BMS_DEBUG
+        Serial.print  (F("  frame["));
+        Serial.print  (dev);
+        Serial.print  (F("] INIT 0x"));
+        Serial.print  (rxBuf[off], HEX);
+        Serial.print  (F(" ADDR 0x"));
+        Serial.print  (rxBuf[off+1], HEX);
+        Serial.print  (F(" CRC "));
+        Serial.println(crc_rx == crc_cal ? F("OK") : F("FAIL"));
+#endif
+
+        if (crc_rx != crc_cal) return BMS_ERROR_CRC;
+
+        memcpy(readBuffer + dev * numBytesToRead,
+               &rxBuf[off + HDR_LEN],
+               numBytesToRead);
+    }
+
+#ifdef BMS_DEBUG
+    Serial.println(F("[BRD_R] success"));
+#endif
+    return BMS_OK;
+}
+
+BMSErrorCode_t bqStackWrite(uint16_t regAddr, uint64_t data, uint8_t numBytes) {
+    return bqWriteReg(0, regAddr, data, numBytes, FRMWRT_STK_W); 
+}
+
+BMSErrorCode_t bqStackRead(uint16_t regAddr, uint8_t *readBuffer, uint8_t numBytesPerDevice, uint32_t timeout_ms) {
+    if (numBytesPerDevice == 0 || numBytesPerDevice > MAX_READ_DATA_BYTES) return BMS_ERROR_INVALID_RESPONSE;
+
+    BMSErrorCode_t status = buildAndSendFrame(0, regAddr, nullptr, numBytesPerDevice, FRMWRT_STK_R); 
+    if (status != BMS_OK) return status;
+
+    size_t singleResponseLength = SINGLE_DEVICE_RESPONSE_OVERHEAD + numBytesPerDevice;
+    size_t totalExpectedLength = singleResponseLength * NUM_BQ79616_DEVICES;
+    
+    if (totalExpectedLength > MAX_STACK_RESPONSE_BUFFER_SIZE) {
+        Serial.println("Error: StackRead total expected response too large for buffer.");
+        return BMS_ERROR_UNKNOWN;
+    }
+    uint8_t tempResponseFrame[MAX_STACK_RESPONSE_BUFFER_SIZE]; // Use a single large buffer
+
+    status = receiveFrame(tempResponseFrame, totalExpectedLength, timeout_ms);
+    if (status != BMS_OK) return status;
+
+    for (int i = 0; i < NUM_BQ79616_DEVICES; ++i) {
+        size_t offset = i * singleResponseLength;
+        uint16_t received_crc = (uint16_t)(tempResponseFrame[offset + singleResponseLength - 1] << 8) | tempResponseFrame[offset + singleResponseLength - 2];
+        uint16_t calculated_crc = calculateCRC16(&tempResponseFrame[offset], singleResponseLength - 2);
+
+        if (received_crc != calculated_crc) {
+            BMS_DEBUG_PRINTF("StackRead CRC mismatch for device in response sequence (index %d, reported DevID %d) Reg 0x%04X!\n", i, tempResponseFrame[offset+1], regAddr);
+            return BMS_ERROR_CRC;
+        }
+        // TODO: Verify responseFrame[offset + 0] (INIT byte), responseFrame[offset + 1] (Device ID)
+        memcpy(readBuffer + (i * numBytesPerDevice), &tempResponseFrame[offset + 4], numBytesPerDevice);
+    }
+    return BMS_OK;
+}
+
+BMSErrorCode_t bqBroadcastWriteReverse(uint16_t regAddr, uint64_t data, uint8_t numBytes) {
+    return bqWriteReg(0, regAddr, data, numBytes, FRMWRT_REV_ALL_W);
+}
+
+// This function is used to wake up the BQ79600 bridge device and the BQ79616 stack devices. It is *only* meant to be called during startup either during initialization or after an error. 
+// you should probably call a shutdown commands before this one; I won't enforce it here now, but maybe later on if it makes sense. 
+BMSErrorCode_t bqWakePing() {
+BMSErrorCode_t status;
+    //step 1
+    Serial.println("Waking up BQ79600 bridge...");
+    if (BQ_UART_SERIAL) BQ_UART_SERIAL.end(); // If Serial 5 is active, then end it 
+    delay(1);
+    pinMode(BQ_UART_WAKE_PIN, OUTPUT); // Set the UART line (bit bang) to an output pin
+    digitalWrite(BQ_UART_WAKE_PIN, LOW); // then drive it low
+    delayMicroseconds(WAKE_PING_DURATION_US); // keep it low for the required duration
+    digitalWrite(BQ_UART_WAKE_PIN, HIGH);  // then drive it high to release the BQ79600 from reset
+    delay(1); // leave it high for the required duration
+    BQ_UART_SERIAL.begin(BQ_UART_BAUDRATE, SERIAL_8N1); // then stop bit banging and start the UART
+    BQ_UART_SERIAL.setTimeout(SERIAL_TIMEOUT_MS); // set the timeout for the UART
+    delay(1); // Allow UART to settle
+
+    delayMicroseconds(BQ79600_WAKE_TO_ACTIVE_US); 
+
+    //step 2 (NEW and needed for reverse)
+    
+    status = bqWriteReg(BQ79600_BRIDGE_DEVICE_ID, BQ79600_CONTROL1, 0x80, 1, FRMWRT_SGL_W);   // DIR_SEL (bit 7) = 1
+    if (status != BMS_OK) {
+        Serial.println("Failed to send DIR_SEL command to bridge.");
+        return status;
+    }
+    delayMicroseconds(BQ79600_WAKE_TO_ACTIVE_US); 
+    Serial.println("BQ79600 DIR_SEL command sent.");
+
+    //step 3
+    status = bqWriteReg(BQ79600_BRIDGE_DEVICE_ID, BQ79600_CONTROL1, 0x20, 1, FRMWRT_SGL_W);   // SEND_WAKE (bit 5) = 1
+    if (status != BMS_OK) {
+        Serial.println("Failed to send WAKE_STACK command to bridge.");
+        return status;
+    }
+    bqDelayUs(STACK_WAKE_PROPAGATION_DELAY_US); // this is set in the config and as per the datasheet. Probably shoudn't fuck with. 
+    Serial.println("BQ79600 WAKE ping sent.");
+
+
+    return BMS_OK; // if this went OK, then we can return BMS_OK (otherwise it will fail and probably time out)
+}
+
 BMSErrorCode_t bqAutoAddressStack() {
     Serial.println("Starting auto-addressing sequence...");
     BMSErrorCode_t status;
