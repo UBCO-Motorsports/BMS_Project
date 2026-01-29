@@ -19,9 +19,9 @@
 #define GPIO_OUT_LOW 0b101
 
 //MUX Select Pins 
-#define MUX_S0 = 6
-#define MUX_S1 = 7
-#define MUX_S2 = 8
+#define MUX_S0 6
+#define MUX_S1 7
+#define MUX_S2 8
 
 
 
@@ -114,6 +114,7 @@ const float SOC_LOOKUP_PERCENTAGES[SOC_VOLTAGE_POINTS] = {0.0f, 10.0f, 50.0f, 90
 
 
 // Enable debug serial prints
+#define BMS_DEBUG  // Global debug flag for conditional compilation
 #define BMS_DEBUG_PRINTLN(x) Serial.println(x)
 #define BMS_DEBUG_PRINT(x) Serial.print(x)
 #define BMS_DEBUG_PRINTF(...) Serial.printf(__VA_ARGS__)
