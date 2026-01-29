@@ -98,6 +98,7 @@ BMSErrorCode_t bqGetAllTemperatures(BMSOverallData_t *bmsData) {
         }
     }
     // Read die temperatures after GPIO temperatures
+    // Reading from DIETEMP1_LO means data comes as [LO, HI] byte order
     status = bqStackRead(DIETEMP1_LO, rawTempData, 2 * NUM_BQ79616_DEVICES, SERIAL_TIMEOUT_MS * NUM_BQ79616_DEVICES);
     if (status != BMS_OK) {
         BMS_DEBUG_PRINTLN("Failed to read die temperatures from stack.");
@@ -105,8 +106,8 @@ BMSErrorCode_t bqGetAllTemperatures(BMSOverallData_t *bmsData) {
     }
     for (int i = 0; i < NUM_BQ79616_DEVICES; ++i) {
         int raw_idx = i * 2; 
-        uint8_t msb = rawTempData[raw_idx];
-        uint8_t lsb = rawTempData[raw_idx + 1];
+        uint8_t lsb = rawTempData[raw_idx];      // LO byte comes first
+        uint8_t msb = rawTempData[raw_idx + 1];  // HI byte comes second
         int16_t raw_dietemp = (int16_t)((msb << 8) | lsb);
         bmsData->modules[i].dieTemperature = (int16_t)((float)raw_dietemp * 0.025f * 10.0f);
     }
