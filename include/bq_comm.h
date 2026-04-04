@@ -25,7 +25,7 @@ BMSErrorCode_t bqBroadcastWriteReverse(uint16_t regAddr, uint64_t data, uint8_t 
 
 //MUXcontrol
 BMSErrorCode_t bqSetGpioconfig(uint8_t deviceID, uint8_t gpioIndex, uint8_t configValue);
-BMSErrorCode_t bqSetMuxChannel(uint8_t channel);
+BMSErrorCode_t bqSetMuxChannel(uint8_t deviceID, uint8_t channel);
 
 void bqInitCommunication();
 BMSErrorCode_t bqWakePing();

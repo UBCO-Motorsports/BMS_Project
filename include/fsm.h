@@ -37,6 +37,8 @@ FSM_State_t transition_fault_startup_error();
 void action_fault_critical();
 FSM_State_t transition_fault_critical();
 
+void process_serial_commands();
+extern bool g_guiManualChargeRequest;
 
 // Helper for NTC voltage conversion
 float convertTemperatureToNtcVoltage(float temperatureC);

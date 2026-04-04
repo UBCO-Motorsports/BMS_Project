@@ -1,0 +1,10 @@
+# Additional clean files
+cmake_minimum_required(VERSION 3.16)
+
+if("${CONFIG}" STREQUAL "" OR "${CONFIG}" STREQUAL "")
+  file(REMOVE_RECURSE
+  "BMS_GUI_autogen"
+  "CMakeFiles\\BMS_GUI_autogen.dir\\AutogenUsed.txt"
+  "CMakeFiles\\BMS_GUI_autogen.dir\\ParseCache.txt"
+  )
+endif()

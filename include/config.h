@@ -6,8 +6,8 @@
 // BMS Stack Configuration
 #define NUM_BQ79616_DEVICES 2
 #define TOTAL_BQ_DEVICES (NUM_BQ79616_DEVICES + 1) 
-#define CELLS_PER_SLAVE 16 
-#define TEMP_SENSORS_PER_SLAVE 8 
+#define CELLS_PER_SLAVE 14 
+#define TEMP_SENSORS_PER_SLAVE 19 
 
 // Teensy 4.0/4.1 Pin Definitions
 #define BQ_UART_SERIAL Serial5 
@@ -38,13 +38,21 @@
 #define AMS_ERROR_PIN 14     
 
 // CAN Bus Configuration
-#define CAN_BAUDRATE 500000 
+#define CAN_BAUDRATE 250000 
 #define CAN_ID_BMS_STATUS       0x6B0 
 #define CAN_ID_BMS_FAULTS       0x6B2 
 #define CAN_ID_CELL_TEMPS_BASE  0x6C0 
 #define CAN_ID_CELL_VOLTS_BASE  0x6D0 
 #define CAN_MSGS_PER_MODULE_VOLTS ((CELLS_PER_SLAVE + 3) / 4) 
 #define CAN_MSGS_PER_MODULE_TEMPS ((TEMP_SENSORS_PER_SLAVE + 3) / 4)
+
+
+//Elcon Charger
+#define CAN_ID_BMS_TO_CHARGER   0x1806E5F4 // BMS Send Out 
+#define CAN_ID_CHARGER_TO_BMS   0x18FF50E5 // Charger Broadcast
+#define CHARGE_MAX_VOLTAGE_MV   58800  
+#define CHARGE_MAX_CURRENT_MA   10000
+#define CHARGER_SEND_INTERVAL_MS 1000
 
 // Timing Constants
 #define WAKE_PING_DURATION_US 2750      
@@ -64,9 +72,9 @@
 #define NFAULT_PIN_ASSERTION_TIMEOUT_MS 500
 
 // Safety Thresholds
-#define MAX_CELL_VOLTAGE_MV 4200
-#define MIN_CELL_VOLTAGE_MV  3000
-#define MAX_CELL_TEMP_C 55
+#define MAX_CELL_VOLTAGE_MV 8200
+#define MIN_CELL_VOLTAGE_MV  700
+#define MAX_CELL_TEMP_C 200
 #define MIN_CELL_TEMP_C -1
 #define MAX_BQ_DIE_TEMP_C 85
 #define OV_HYSTERESIS_MV 200

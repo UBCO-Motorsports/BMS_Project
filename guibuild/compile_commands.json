@@ -1,0 +1,56 @@
+[
+{
+  "directory": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild",
+  "command": "C:\\msys64\\mingw64\\bin\\c++.exe -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/include\" -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/mock\" -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/include\" -isystem C:/msys64/mingw64/include/QtWidgets -isystem C:/msys64/mingw64/include/QtGui -isystem C:/msys64/mingw64/include/QtCore -isystem C:/msys64/mingw64/share/qt5/mkspecs/win32-g++ -std=gnu++17 -o CMakeFiles\\BMS_GUI.dir\\BMS_GUI_autogen\\mocs_compilation.cpp.obj -c \"C:\\Users\\lessa\\Downloads\\26 W2\\BMS_Project-main\\BMS_Project-main\\guibuild\\BMS_GUI_autogen\\mocs_compilation.cpp\"",
+  "file": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/mocs_compilation.cpp",
+  "output": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/CMakeFiles/BMS_GUI.dir/BMS_GUI_autogen/mocs_compilation.cpp.obj"
+},
+{
+  "directory": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild",
+  "command": "C:\\msys64\\mingw64\\bin\\c++.exe -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/include\" -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/mock\" -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/include\" -isystem C:/msys64/mingw64/include/QtWidgets -isystem C:/msys64/mingw64/include/QtGui -isystem C:/msys64/mingw64/include/QtCore -isystem C:/msys64/mingw64/share/qt5/mkspecs/win32-g++ -std=gnu++17 -o CMakeFiles\\BMS_GUI.dir\\src\\main_gui.cpp.obj -c \"C:\\Users\\lessa\\Downloads\\26 W2\\BMS_Project-main\\BMS_Project-main\\src\\main_gui.cpp\"",
+  "file": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/src/main_gui.cpp",
+  "output": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/CMakeFiles/BMS_GUI.dir/src/main_gui.cpp.obj"
+},
+{
+  "directory": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild",
+  "command": "C:\\msys64\\mingw64\\bin\\c++.exe -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/include\" -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/mock\" -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/include\" -isystem C:/msys64/mingw64/include/QtWidgets -isystem C:/msys64/mingw64/include/QtGui -isystem C:/msys64/mingw64/include/QtCore -isystem C:/msys64/mingw64/share/qt5/mkspecs/win32-g++ -std=gnu++17 -o CMakeFiles\\BMS_GUI.dir\\src\\MainWindow.cpp.obj -c \"C:\\Users\\lessa\\Downloads\\26 W2\\BMS_Project-main\\BMS_Project-main\\src\\MainWindow.cpp\"",
+  "file": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/src/MainWindow.cpp",
+  "output": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/CMakeFiles/BMS_GUI.dir/src/MainWindow.cpp.obj"
+},
+{
+  "directory": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild",
+  "command": "C:\\msys64\\mingw64\\bin\\c++.exe -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/include\" -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/mock\" -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/include\" -isystem C:/msys64/mingw64/include/QtWidgets -isystem C:/msys64/mingw64/include/QtGui -isystem C:/msys64/mingw64/include/QtCore -isystem C:/msys64/mingw64/share/qt5/mkspecs/win32-g++ -std=gnu++17 -o CMakeFiles\\BMS_GUI.dir\\mock\\mock_arduino.cpp.obj -c \"C:\\Users\\lessa\\Downloads\\26 W2\\BMS_Project-main\\BMS_Project-main\\mock\\mock_arduino.cpp\"",
+  "file": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/mock/mock_arduino.cpp",
+  "output": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/CMakeFiles/BMS_GUI.dir/mock/mock_arduino.cpp.obj"
+},
+{
+  "directory": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild",
+  "command": "C:\\msys64\\mingw64\\bin\\c++.exe -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/include\" -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/mock\" -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/include\" -isystem C:/msys64/mingw64/include/QtWidgets -isystem C:/msys64/mingw64/include/QtGui -isystem C:/msys64/mingw64/include/QtCore -isystem C:/msys64/mingw64/share/qt5/mkspecs/win32-g++ -std=gnu++17 -o CMakeFiles\\BMS_GUI.dir\\src\\bq_comm.cpp.obj -c \"C:\\Users\\lessa\\Downloads\\26 W2\\BMS_Project-main\\BMS_Project-main\\src\\bq_comm.cpp\"",
+  "file": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/src/bq_comm.cpp",
+  "output": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/CMakeFiles/BMS_GUI.dir/src/bq_comm.cpp.obj"
+},
+{
+  "directory": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild",
+  "command": "C:\\msys64\\mingw64\\bin\\c++.exe -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/include\" -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/mock\" -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/include\" -isystem C:/msys64/mingw64/include/QtWidgets -isystem C:/msys64/mingw64/include/QtGui -isystem C:/msys64/mingw64/include/QtCore -isystem C:/msys64/mingw64/share/qt5/mkspecs/win32-g++ -std=gnu++17 -o CMakeFiles\\BMS_GUI.dir\\src\\bq_data.cpp.obj -c \"C:\\Users\\lessa\\Downloads\\26 W2\\BMS_Project-main\\BMS_Project-main\\src\\bq_data.cpp\"",
+  "file": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/src/bq_data.cpp",
+  "output": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/CMakeFiles/BMS_GUI.dir/src/bq_data.cpp.obj"
+},
+{
+  "directory": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild",
+  "command": "C:\\msys64\\mingw64\\bin\\c++.exe -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/include\" -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/mock\" -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/include\" -isystem C:/msys64/mingw64/include/QtWidgets -isystem C:/msys64/mingw64/include/QtGui -isystem C:/msys64/mingw64/include/QtCore -isystem C:/msys64/mingw64/share/qt5/mkspecs/win32-g++ -std=gnu++17 -o CMakeFiles\\BMS_GUI.dir\\src\\can_bus.cpp.obj -c \"C:\\Users\\lessa\\Downloads\\26 W2\\BMS_Project-main\\BMS_Project-main\\src\\can_bus.cpp\"",
+  "file": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/src/can_bus.cpp",
+  "output": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/CMakeFiles/BMS_GUI.dir/src/can_bus.cpp.obj"
+},
+{
+  "directory": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild",
+  "command": "C:\\msys64\\mingw64\\bin\\c++.exe -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/include\" -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/mock\" -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/include\" -isystem C:/msys64/mingw64/include/QtWidgets -isystem C:/msys64/mingw64/include/QtGui -isystem C:/msys64/mingw64/include/QtCore -isystem C:/msys64/mingw64/share/qt5/mkspecs/win32-g++ -std=gnu++17 -o CMakeFiles\\BMS_GUI.dir\\src\\fault_handler.cpp.obj -c \"C:\\Users\\lessa\\Downloads\\26 W2\\BMS_Project-main\\BMS_Project-main\\src\\fault_handler.cpp\"",
+  "file": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/src/fault_handler.cpp",
+  "output": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/CMakeFiles/BMS_GUI.dir/src/fault_handler.cpp.obj"
+},
+{
+  "directory": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild",
+  "command": "C:\\msys64\\mingw64\\bin\\c++.exe -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/include\" -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/mock\" -I\"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/include\" -isystem C:/msys64/mingw64/include/QtWidgets -isystem C:/msys64/mingw64/include/QtGui -isystem C:/msys64/mingw64/include/QtCore -isystem C:/msys64/mingw64/share/qt5/mkspecs/win32-g++ -std=gnu++17 -o CMakeFiles\\BMS_GUI.dir\\src\\fsm.cpp.obj -c \"C:\\Users\\lessa\\Downloads\\26 W2\\BMS_Project-main\\BMS_Project-main\\src\\fsm.cpp\"",
+  "file": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/src/fsm.cpp",
+  "output": "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/CMakeFiles/BMS_GUI.dir/src/fsm.cpp.obj"
+}
+]
