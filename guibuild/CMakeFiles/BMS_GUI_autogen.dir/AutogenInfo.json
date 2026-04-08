@@ -1,0 +1,168 @@
+{
+	"AUTOGEN_COMMAND_LINE_LENGTH_MAX" : 32000,
+	"BUILD_DIR" : "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen",
+	"CMAKE_BINARY_DIR" : "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild",
+	"CMAKE_CURRENT_BINARY_DIR" : "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild",
+	"CMAKE_CURRENT_SOURCE_DIR" : "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main",
+	"CMAKE_EXECUTABLE" : "C:/msys64/mingw64/bin/cmake.exe",
+	"CMAKE_LIST_FILES" : 
+	[
+		"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/CMakeLists.txt",
+		"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/CMakeFiles/4.2.3/CMakeSystem.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/Platform/Windows-Initialize.cmake",
+		"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/CMakeFiles/4.2.3/CMakeCXXCompiler.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/CMakeSystemSpecificInformation.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/CMakeGenericSystem.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/CMakeInitializeConfigs.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/Platform/Windows.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/Platform/WindowsPaths.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/CMakeCXXInformation.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/CMakeLanguageInformation.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/Compiler/GNU-CXX.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/Compiler/GNU.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/Platform/Windows-GNU-CXX.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/Platform/Windows-GNU.cmake",
+		"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/CMakeFiles/4.2.3/CMakeRCCompiler.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/CMakeRCInformation.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/Platform/Windows-windres.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/Platform/Windows-GNU-CXX-ABI.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/CMakeCommonLanguageInclude.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/Internal/CMakeCXXLinkerInformation.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/Internal/CMakeCommonLinkerInformation.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/Linker/GNU-CXX.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/Linker/GNU.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/Platform/Linker/Windows-GNU-CXX.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/Platform/Linker/Windows-GNU.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/Platform/Linker/GNU.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5/Qt5ConfigVersion.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5/Qt5Config.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5/Qt5ModuleLocation.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Widgets/Qt5WidgetsConfigVersion.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Widgets/Qt5WidgetsConfig.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5GuiConfigVersion.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5GuiConfig.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Core/Qt5CoreConfigVersion.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Core/Qt5CoreConfig.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Core/Qt5CoreConfigExtras.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Core/Qt5CoreMacros.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/CMakeParseArguments.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5Gui_QGifPlugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5Gui_QICNSPlugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5Gui_QICOPlugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5Gui_QJp2Plugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5Gui_QJpegPlugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5Gui_QMinimalIntegrationPlugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5Gui_QMngPlugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5Gui_QOffscreenIntegrationPlugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5Gui_QPdfPlugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5Gui_QSvgIconPlugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5Gui_QSvgPlugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5Gui_QTgaPlugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5Gui_QTiffPlugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5Gui_QTuioTouchPlugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5Gui_QVirtualKeyboardPlugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5Gui_QWbmpPlugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5Gui_QWebGLIntegrationPlugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5Gui_QWebpPlugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5Gui_QWindowsDirect2DIntegrationPlugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5Gui_QWindowsIntegrationPlugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Gui/Qt5GuiConfigExtras.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Widgets/Qt5Widgets_QWindowsVistaStylePlugin.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Widgets/Qt5WidgetsConfigExtras.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5Widgets/Qt5WidgetsMacros.cmake",
+		"C:/msys64/mingw64/share/cmake/Modules/CMakeParseArguments.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5SerialPort/Qt5SerialPortConfigVersion.cmake",
+		"C:/msys64/mingw64/lib/cmake/Qt5SerialPort/Qt5SerialPortConfig.cmake"
+	],
+	"CMAKE_SOURCE_DIR" : "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main",
+	"CROSS_CONFIG" : false,
+	"DEP_FILE" : "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/deps",
+	"DEP_FILE_RULE_NAME" : "BMS_GUI_autogen/timestamp",
+	"HEADERS" : 
+	[
+		[
+			"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/include/MainWindow.h",
+			"MU",
+			"6YEA5652QU/moc_MainWindow.cpp",
+			null
+		]
+	],
+	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
+	"INCLUDE_DIR" : "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/include",
+	"MOC_COMPILATION_FILE" : "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/mocs_compilation.cpp",
+	"MOC_DEFINITIONS" : 
+	[
+		"QT_CORE_LIB",
+		"QT_GUI_LIB",
+		"QT_NO_DEBUG",
+		"QT_SERIALPORT_LIB",
+		"QT_WIDGETS_LIB"
+	],
+	"MOC_DEPEND_FILTERS" : 
+	[
+		[
+			"Q_PLUGIN_METADATA",
+			"[\n][ \t]*Q_PLUGIN_METADATA[ \t]*\\([^\\)]*FILE[ \t]*\"([^\"]+)\""
+		]
+	],
+	"MOC_INCLUDES" : 
+	[
+		"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/include",
+		"C:/msys64/mingw64/include/QtWidgets",
+		"C:/msys64/mingw64/include/QtGui",
+		"C:/msys64/mingw64/include/QtCore",
+		"C:/msys64/mingw64/share/qt5/mkspecs/win32-g++",
+		"C:/msys64/mingw64/include/QtSerialPort",
+		"C:/msys64/mingw64/include",
+		"C:/msys64/mingw64/include/c++/15.2.0",
+		"C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32",
+		"C:/msys64/mingw64/include/c++/15.2.0/backward",
+		"C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include",
+		"C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include-fixed"
+	],
+	"MOC_MACRO_NAMES" : [ "Q_OBJECT", "Q_GADGET", "Q_NAMESPACE", "Q_NAMESPACE_EXPORT" ],
+	"MOC_OPTIONS" : [],
+	"MOC_PATH_PREFIX" : false,
+	"MOC_PREDEFS_CMD" : 
+	[
+		"C:/msys64/mingw64/bin/c++.exe",
+		"-std=gnu++17",
+		"-w",
+		"-dM",
+		"-E",
+		"C:/msys64/mingw64/share/cmake/Modules/CMakeCXXCompilerABI.cpp"
+	],
+	"MOC_PREDEFS_FILE" : "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/moc_predefs.h",
+	"MOC_RELAXED_MODE" : false,
+	"MOC_SKIP" : [],
+	"MULTI_CONFIG" : false,
+	"PARALLEL" : 4,
+	"PARSE_CACHE_FILE" : "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/CMakeFiles/BMS_GUI_autogen.dir/ParseCache.txt",
+	"QT_MOC_EXECUTABLE" : "C:/msys64/mingw64/bin/moc.exe",
+	"QT_UIC_EXECUTABLE" : "C:/msys64/mingw64/bin/uic.exe",
+	"QT_VERSION_MAJOR" : 5,
+	"QT_VERSION_MINOR" : 15,
+	"SETTINGS_FILE" : "C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/CMakeFiles/BMS_GUI_autogen.dir/AutogenUsed.txt",
+	"SOURCES" : 
+	[
+		[
+			"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/src/MainWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/src/main_gui.cpp",
+			"MU",
+			null
+		]
+	],
+	"UIC_OPTIONS" : [],
+	"UIC_SEARCH_PATHS" : [],
+	"UIC_SKIP" : [],
+	"UIC_UI_FILES" : [],
+	"USE_BETTER_GRAPH" : false,
+	"VERBOSITY" : 0
+}

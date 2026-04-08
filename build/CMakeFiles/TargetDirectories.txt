@@ -1,0 +1,5 @@
+C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/build/CMakeFiles/BMS_GUI.dir
+C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/build/CMakeFiles/edit_cache.dir
+C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/build/CMakeFiles/rebuild_cache.dir
+C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/build/CMakeFiles/BMS_GUI_autogen_timestamp_deps.dir
+C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/build/CMakeFiles/BMS_GUI_autogen.dir

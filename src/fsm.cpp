@@ -7,6 +7,7 @@
 #include "B0_reg.h"      
 #include <math.h>        
 #include <string.h> 
+#include "charger_comm.h"
 
 // Voltage thresholds are defined in config.h; do not redefine here.
 
@@ -17,6 +18,7 @@ unsigned long g_lastFsmRunTime = 0;
 unsigned long g_lastCanTransmitTime = 0;
 unsigned long fault_startup_error_entry_ts = 0;
 static unsigned long startup_attempt_timestamp = 0;
+static unsigned long last_charger_send_time = 0;
 
 
 void fsm_change_state(FSM_State_t newState) {
@@ -96,6 +98,27 @@ void fsm_init() {
 }
 
 void fsm_run() {
+
+    /*Changing mode shii*/
+    can_process_incoming_messages();
+    process_serial_commands();
+    if (millis() - last_charger_send_time >= CHARGER_SEND_INTERVAL_MS) {
+        
+        bool is_system_safe = (!g_faultState.ovuv_fault_confirmed && 
+                               !g_faultState.otut_fault_confirmed && 
+                               g_bmsData.imd_status_ok);
+                              
+        bool state_allows_charge = (g_currentState == FSM_STATE_NORMAL_OPERATION || 
+                                    g_currentState == FSM_STATE_CELL_BALANCING);
+
+        // Final decision: Safe + Correct State + User clicked 'Start' in GUI
+        bool charging_enabled = (is_system_safe && state_allows_charge && g_guiManualChargeRequest);
+        
+        charger_send_command(charging_enabled);
+        last_charger_send_time = millis();
+    }
+
+
     if (millis() - g_lastFsmRunTime < STATE_MACHINE_INTERVAL_MS) {
         return; 
     }
@@ -145,6 +168,20 @@ void fsm_run() {
             g_lastCanTransmitTime = millis();
         }
     }
+
+    // Handle Charger Comms every 1000ms
+
+
+
+    if (millis() - last_charger_send_time >= CHARGER_SEND_INTERVAL_MS) {
+        // Only send "Start" (0) if we are in a safe state and not in fault
+        bool allow_charge = (g_currentState == FSM_STATE_NORMAL_OPERATION || 
+                             g_currentState == FSM_STATE_CELL_BALANCING);
+        charger_send_command(allow_charge);
+        last_charger_send_time = millis();
+    }
+
+    
 
     // --- Always print BMS data at the end of each FSM cycle ---
     send_pack_data(&g_bmsData);
@@ -588,3 +625,22 @@ FSM_State_t transition_fault_critical() {
 
 /* Removed unused shutdown/system off functions and all references to them */
 
+/* flag for charging mode on GUI*/
+// Add a global flag in your Teensy project (e.g., in fsm.cpp or a new commands.cpp)
+bool g_guiManualChargeRequest = false;
+
+void process_serial_commands() {
+    if (Serial.available() > 0) {
+        String cmd = Serial.readStringUntil('\n');
+        cmd.trim();
+
+        if (cmd == "CMD:CHARGE_ON") {
+            g_guiManualChargeRequest = true;
+            BMS_DEBUG_PRINTLN("GUI: Charge Request Received");
+        } 
+        else if (cmd == "CMD:CHARGE_OFF") {
+            g_guiManualChargeRequest = false;
+            BMS_DEBUG_PRINTLN("GUI: Charge Stop Received");
+        }
+    }
+}

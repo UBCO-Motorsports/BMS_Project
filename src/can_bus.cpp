@@ -1,6 +1,7 @@
 #include "can_bus.h" 
 #include "config.h" // For BMS_DEBUG_PRINTLN and CAN IDs
 #include "fault_handler.h" // For g_faultState
+#include "charger_comm.h" // elcon
 
 FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> CanBus;
 
@@ -147,10 +148,12 @@ void can_send_bms_data(const BMSOverallData_t *bmsData) {
 void can_process_incoming_messages() { 
     CAN_message_t msg;
     if (CanBus.read(msg)) {
-        BMS_DEBUG_PRINTF("CAN RX ID: 0x%03X, Len: %d, Data: ", msg.id, msg.len);
-        for (int i = 0; i < msg.len; ++i) {
-            BMS_DEBUG_PRINTF("%02X ", msg.buf[i]);
+        // Handle Charger Messages
+        if (msg.id == CAN_ID_CHARGER_TO_BMS) {
+            charger_process_message(msg);
         }
-        BMS_DEBUG_PRINTLN("");
+        
+        // Existing debug print
+        BMS_DEBUG_PRINTF("CAN RX ID: 0x%08X\n", msg.id);
     }
 }

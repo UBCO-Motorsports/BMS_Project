@@ -1,0 +1,57 @@
+# ninja log v7
+233	10098	7941839972090655	BMS_GUI_autogen/timestamp	334aa0333541e22d
+233	10098	7941839972090655	BMS_GUI_autogen/mocs_compilation.cpp	334aa0333541e22d
+233	10098	7941839972090655	C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/timestamp	334aa0333541e22d
+233	10098	7941839972090655	C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/mocs_compilation.cpp	334aa0333541e22d
+10132	15943	7941839973683516	CMakeFiles/BMS_GUI.dir/src/bq_comm.cpp.obj	561ba041dfc4a36e
+10162	15904	7941839973994423	CMakeFiles/BMS_GUI.dir/src/can_bus.cpp.obj	a0317e6de0264819
+10178	15913	7941839974144662	CMakeFiles/BMS_GUI.dir/src/fault_handler.cpp.obj	76e1f1cd2cfaa14f
+1060	3113	7941394171696737	CMakeFiles/BMS_GUI.dir/mock/mock_arduino.cpp.obj	f6bb991da6629d13
+10191	15918	7941839974256913	CMakeFiles/BMS_GUI.dir/src/fsm.cpp.obj	247187c52ad69b07
+10146	15928	7941839973847183	CMakeFiles/BMS_GUI.dir/src/bq_data.cpp.obj	92380e8fd61757a4
+1037	3804	7941394171441195	CMakeFiles/BMS_GUI.dir/BMS_GUI_autogen/mocs_compilation.cpp.obj	fe079607803985a8
+1044	3845	7941394171516649	CMakeFiles/BMS_GUI.dir/src/main_gui.cpp.obj	fb6eafa588039b69
+339	3563	7941410234690864	CMakeFiles/BMS_GUI.dir/src/MainWindow.cpp.obj	d2778e7212430d1b
+3564	4038	7941410266944006	BMS_GUI.exe	7e7de6c7a59ce34e
+143	5915	7941842286292940	build.ninja	1f35c428726a1a35
+143	5915	7941842286124420	C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/cmake_install.cmake	1f35c428726a1a35
+100	766	7941842286292940	build.ninja	1f35c428726a1a35
+100	766	7941842286292940	C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/cmake_install.cmake	1f35c428726a1a35
+66	1746	7941842303825326	BMS_GUI_autogen/timestamp	334aa0333541e22d
+66	1746	7941842303825326	BMS_GUI_autogen/mocs_compilation.cpp	334aa0333541e22d
+66	1746	7941842303825326	C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/timestamp	334aa0333541e22d
+66	1746	7941842303825326	C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/mocs_compilation.cpp	334aa0333541e22d
+1750	5114	7941842305284664	CMakeFiles/BMS_GUI.dir/BMS_GUI_autogen/mocs_compilation.cpp.obj	9581a2ac9d3ecdac
+1760	5150	7941842305342266	CMakeFiles/BMS_GUI.dir/src/main_gui.cpp.obj	ffefb4d09dfa00cb
+1772	6696	7941842305540740	CMakeFiles/BMS_GUI.dir/src/MainWindow.cpp.obj	25ba5b69d284df5a
+6697	7534	7941842354742541	BMS_GUI.exe	668920aac7a6485a
+80	477	7941844362275827	BMS_GUI_autogen/timestamp	334aa0333541e22d
+80	477	7941844362275827	BMS_GUI_autogen/mocs_compilation.cpp	334aa0333541e22d
+80	477	7941844362275827	C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/timestamp	334aa0333541e22d
+80	477	7941844362275827	C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/mocs_compilation.cpp	334aa0333541e22d
+186	901	7941851776087575	BMS_GUI_autogen/timestamp	334aa0333541e22d
+186	901	7941851776087575	BMS_GUI_autogen/mocs_compilation.cpp	334aa0333541e22d
+186	901	7941851776087575	C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/timestamp	334aa0333541e22d
+186	901	7941851776087575	C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/mocs_compilation.cpp	334aa0333541e22d
+905	5075	7941851783203520	CMakeFiles/BMS_GUI.dir/src/MainWindow.cpp.obj	25ba5b69d284df5a
+5076	5604	7941851824947309	BMS_GUI.exe	668920aac7a6485a
+264	982	7943666784054984	BMS_GUI_autogen/timestamp	334aa0333541e22d
+264	982	7943666784054984	BMS_GUI_autogen/mocs_compilation.cpp	334aa0333541e22d
+264	982	7943666784054984	C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/timestamp	334aa0333541e22d
+264	982	7943666784054984	C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/mocs_compilation.cpp	334aa0333541e22d
+985	18749	7943666791246602	CMakeFiles/BMS_GUI.dir/src/MainWindow.cpp.obj	25ba5b69d284df5a
+18750	19561	7943666968875831	BMS_GUI.exe	668920aac7a6485a
+232	2990	7943714691480213	BMS_GUI_autogen/timestamp	334aa0333541e22d
+232	2990	7943714691480213	BMS_GUI_autogen/mocs_compilation.cpp	334aa0333541e22d
+232	2990	7943714691480213	C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/timestamp	334aa0333541e22d
+232	2990	7943714691480213	C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/mocs_compilation.cpp	334aa0333541e22d
+3252	7018	7943714695287947	CMakeFiles/BMS_GUI.dir/src/main_gui.cpp.obj	ffefb4d09dfa00cb
+2992	7023	7943714692676787	CMakeFiles/BMS_GUI.dir/BMS_GUI_autogen/mocs_compilation.cpp.obj	9581a2ac9d3ecdac
+3266	7588	7943714695431480	CMakeFiles/BMS_GUI.dir/src/MainWindow.cpp.obj	25ba5b69d284df5a
+43	828	7943716109895500	BMS_GUI.exe	668920aac7a6485a
+207	536	7959279432634795	BMS_GUI_autogen/timestamp	334aa0333541e22d
+207	536	7959279432634795	BMS_GUI_autogen/mocs_compilation.cpp	334aa0333541e22d
+207	536	7959279432634795	C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/timestamp	334aa0333541e22d
+207	536	7959279432634795	C:/Users/lessa/Downloads/26 W2/BMS_Project-main/BMS_Project-main/guibuild/BMS_GUI_autogen/mocs_compilation.cpp	334aa0333541e22d
+537	12310	7959279435900017	CMakeFiles/BMS_GUI.dir/src/MainWindow.cpp.obj	25ba5b69d284df5a
+12310	13101	7959279553707076	BMS_GUI.exe	668920aac7a6485a

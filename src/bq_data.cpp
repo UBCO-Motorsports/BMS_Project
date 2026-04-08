@@ -4,6 +4,7 @@
 #include "bq79600_reg.h"
 #include <math.h> 
 #include <string.h> // For memset
+#include "charger_comm.h"
 
 
 BMSOverallData_t g_bmsData; // Definition of g_bmsData
@@ -60,56 +61,112 @@ BMSErrorCode_t bqGetAllCellVoltages(BMSOverallData_t *bmsData) {
     return BMS_OK;
 }
 
+// --- MUX CONTROL (Dual Mux via GPIO 6, 7, 8) ---
+void setMuxChannel(uint8_t ch) {
+    ch &= 0x07; 
+    uint8_t val_S0 = (ch & 0x01) ? 0x04 : 0x05; // GPIO 6
+    uint8_t val_S1 = (ch & 0x02) ? 0x04 : 0x05; // GPIO 7
+    uint8_t val_S2 = (ch & 0x04) ? 0x04 : 0x05; // GPIO 8
+
+    // GPIO 5 (Mux 2 In) MUST be 0x00 (Input)
+    uint8_t conf3_val = (val_S0 << 3) | 0x00; 
+    uint8_t conf4_val = (val_S2 << 3) | val_S1;
+
+    bqBroadcastWrite(GPIO_CONF3, conf3_val, 1);
+    bqBroadcastWrite(GPIO_CONF4, conf4_val, 1);
+    delayMicroseconds(50); 
+}
+
 BMSErrorCode_t bqGetAllTemperatures(BMSOverallData_t *bmsData) {
-    // Reference: legacy code and cell voltage access pattern
-    uint8_t rawTempData[(TEMP_SENSORS_PER_SLAVE * 2 + 6) * NUM_BQ79616_DEVICES] = {0};
+    
+    const float a1 = 0.003354016f, b1 = 0.000256524f, c1 = 2.61E-6f, d1 = 6.33E-8f;
+    const float REF_R = 10000.0f, REF_V = 5.0f;
+    BMSErrorCode_t status;
+    uint8_t rawData[6 * NUM_BQ79616_DEVICES]; 
 
-    BMSErrorCode_t status = bqStackRead(GPIO1_HI, rawTempData, TEMP_SENSORS_PER_SLAVE * 2, SERIAL_TIMEOUT_MS * NUM_BQ79616_DEVICES);
-    if (status != BMS_OK) {
-        BMS_DEBUG_PRINTLN("Failed to read GPIO temperatures from stack.");
-        return status;
-    }
+    // ============================================================
+    // PART 1: DIRECT READ (Indices 0, 1, 2)
+    // Reads GPIO 1, 2, 3
+    // ============================================================
+    status = bqStackRead(GPIO1_HI, rawData, 6, SERIAL_TIMEOUT_MS * NUM_BQ79616_DEVICES);
+    if (status != BMS_OK) return status;
 
-    // Steinhart-Hart coefficients (use legacy values)
-    const float a1 = 0.003354016f;
-    const float b1 = 0.000256524f;
-    const float c1 = 2.61E-6f;
-    const float d1 = 6.33E-8f;
-    const float REF_RESISTOR = 10000.0f;
-    const float REF_VOLTAGE = 5.0f;
+    for (int mod = 0; mod < NUM_BQ79616_DEVICES; mod++) {
+        for (int i = 0; i < 3; i++) { 
+            int raw_idx = (mod * 6) + (i * 2);
+            uint16_t raw = ((rawData[raw_idx] & 0xFF) << 8) | (rawData[raw_idx+1] & 0xFF);
+            
+            // Map GPIO 1->[0], GPIO 2->[1], GPIO 3->[2]
+            int idx = i; 
 
-    for (uint16_t cb = 0; cb < NUM_BQ79616_DEVICES; cb++) {
-        // Each module's temp data is packed sequentially, just like voltages
-        for (int i = 0; i < TEMP_SENSORS_PER_SLAVE; i++) {
-            int raw_idx = (cb * TEMP_SENSORS_PER_SLAVE * 2) + (i * 2);
-            uint8_t msb = rawTempData[raw_idx];
-            uint8_t lsb = rawTempData[raw_idx + 1];
-            uint16_t raw_data = ((msb & 0xFF) << 8) | (lsb & 0xFF);
-            float temp_voltage = (float)raw_data * 0.15259f;
-            if (temp_voltage >= 4800.0f) {
-                bmsData->modules[cb].cellTemperatures[i] = 255;
+            float val_mv = (float)raw * 0.15259f;
+            if (val_mv >= 4800.0f) {
+                bmsData->modules[mod].cellTemperatures[idx] = 255;
             } else {
-                float voltage = temp_voltage / 1000.0f;
-                float resistance = (REF_RESISTOR * voltage) / (REF_VOLTAGE - voltage);
-                float log_r = logf(resistance / REF_RESISTOR);
-                float temp_c = 1.0f / (a1 + b1 * log_r + c1 * powf(log_r, 2) + d1 * powf(log_r, 3)) - 273.15f;
-                bmsData->modules[cb].cellTemperatures[i] = (int16_t)(temp_c * 10.0f);
+                float v = val_mv / 1000.0f;
+                if (REF_V - v < 0.001f) v = REF_V - 0.001f;
+                float r = (REF_R * v) / (REF_V - v);
+                float log_r = logf(r / REF_R);
+                float t = 1.0f / (a1 + b1 * log_r + c1 * powf(log_r, 2) + d1 * powf(log_r, 3)) - 273.15f;
+                bmsData->modules[mod].cellTemperatures[idx] = (int16_t)(t * 10.0f);
             }
         }
     }
-    // Read die temperatures after GPIO temperatures
-    // Reading from DIETEMP1_LO means data comes as [LO, HI] byte order
-    status = bqStackRead(DIETEMP1_LO, rawTempData, 2 * NUM_BQ79616_DEVICES, SERIAL_TIMEOUT_MS * NUM_BQ79616_DEVICES);
-    if (status != BMS_OK) {
-        BMS_DEBUG_PRINTLN("Failed to read die temperatures from stack.");
-        return status;
+
+    // ============================================================
+    // PART 2: MULTIPLEXED READ (Indices 3 to 18)
+    // Reads GPIO 4 (Mux 1) and GPIO 5 (Mux 2)
+    // ============================================================
+    for (uint8_t ch = 0; ch < 8; ch++) {
+        setMuxChannel(ch); 
+
+        // Read GPIO 4 and GPIO 5 together
+        status = bqStackRead(GPIO4_HI, rawData, 4, SERIAL_TIMEOUT_MS * NUM_BQ79616_DEVICES);
+        if (status != BMS_OK) return status;
+
+        for (int mod = 0; mod < NUM_BQ79616_DEVICES; mod++) {
+            int base_idx = mod * 4;
+
+            // --- MUX 1 (GPIO 4) -> Store in [3..10] ---
+            uint16_t raw1 = ((rawData[base_idx] & 0xFF) << 8) | (rawData[base_idx+1] & 0xFF);
+            float v1 = (float)raw1 * 0.15259f;
+            int idx1 = 3 + ch; // Starts at Index 3
+            
+            if (v1 >= 4800.0f) bmsData->modules[mod].cellTemperatures[idx1] = 255;
+            else {
+                float v = v1 / 1000.0f;
+                if (REF_V - v < 0.001f) v = REF_V - 0.001f;
+                float r = (REF_R * v) / (REF_V - v);
+                float log_r = logf(r / REF_R);
+                float t = 1.0f / (a1 + b1 * log_r + c1 * powf(log_r, 2) + d1 * powf(log_r, 3)) - 273.15f;
+                bmsData->modules[mod].cellTemperatures[idx1] = (int16_t)(t * 10.0f);
+            }
+
+            // --- MUX 2 (GPIO 5) -> Store in [11..18] ---
+            uint16_t raw2 = ((rawData[base_idx+2] & 0xFF) << 8) | (rawData[base_idx+3] & 0xFF);
+            float v2 = (float)raw2 * 0.15259f;
+            int idx2 = 11 + ch; // Starts at Index 11 (3 Direct + 8 Mux1)
+            
+            if (v2 >= 4800.0f) bmsData->modules[mod].cellTemperatures[idx2] = 255;
+            else {
+                float v = v2 / 1000.0f;
+                if (REF_V - v < 0.001f) v = REF_V - 0.001f;
+                float r = (REF_R * v) / (REF_V - v);
+                float log_r = logf(r / REF_R);
+                float t = 1.0f / (a1 + b1 * log_r + c1 * powf(log_r, 2) + d1 * powf(log_r, 3)) - 273.15f;
+                bmsData->modules[mod].cellTemperatures[idx2] = (int16_t)(t * 10.0f);
+            }
+        }
     }
-    for (int i = 0; i < NUM_BQ79616_DEVICES; ++i) {
-        int raw_idx = i * 2; 
-        uint8_t lsb = rawTempData[raw_idx];      // LO byte comes first
-        uint8_t msb = rawTempData[raw_idx + 1];  // HI byte comes second
-        int16_t raw_dietemp = (int16_t)((msb << 8) | lsb);
-        bmsData->modules[i].dieTemperature = (int16_t)((float)raw_dietemp * 0.025f * 10.0f);
+
+    // --- Die Temp Logic ---
+    uint8_t dieData[2 * NUM_BQ79616_DEVICES];
+    status = bqStackRead(DIETEMP1_HI, dieData, 2 * NUM_BQ79616_DEVICES, SERIAL_TIMEOUT_MS * NUM_BQ79616_DEVICES);
+    if (status == BMS_OK) {
+        for (int i = 0; i < NUM_BQ79616_DEVICES; ++i) {
+            uint16_t raw = ((dieData[i*2] & 0xFF) << 8) | (dieData[i*2 + 1] & 0xFF);
+            bmsData->modules[i].dieTemperature = (int16_t)((float)raw * 0.025f * 10.0f);
+        }
     }
 
     processRawTemperatures(bmsData);
@@ -281,7 +338,6 @@ void readSystemInputs(BMSOverallData_t *bmsData) {
     bmsData->neg_air_closed = (digitalRead(NEG_AIR_STATUS_PIN) == HIGH);
 }
 
-
 BMSErrorCode_t bqStartCellBalancing(BMSOverallData_t *bmsData) {
     // Issue the legacy stack-wide balance command for all modules
     BMSErrorCode_t status = bqWriteReg(0, BAL_CTRL2, 0x33, 1, FRMWRT_STK_W);
@@ -418,6 +474,19 @@ void printBQDump() {
 void send_pack_data(const BMSOverallData_t *d)
 {
 
+    // 0) Changing Info
+
+    // Add this to your Teensy serial print function
+    Serial.printf("Charger Voltage  : %u mV\n", g_chargerStatus.outputVoltage_mV);
+    Serial.printf("Charger Current  : %u mA\n", g_chargerStatus.outputCurrent_mA);
+    Serial.printf("Charger Temp     : %d C\n", g_chargerStatus.internalTemp_C);
+    Serial.printf("Charger Input V  : %u V\n", g_chargerStatus.inputVoltage_V);
+    Serial.printf("Charger Faults   : %s%s%s%s\n", 
+    g_chargerStatus.hardwareFailure ? "HW " : "",
+    g_chargerStatus.overTemp ? "OT " : "",
+    g_chargerStatus.inputVoltageAbnormal ? "Input " : "",
+    g_chargerStatus.commTimeout ? "Timeout" : "OK");
+
     // 2) Pack metrics
     Serial.println("\n--- Pack Metrics ---");
     Serial.printf("Total Pack Voltage : %u mV\n", d->totalPackVoltage_mV);
@@ -426,6 +495,7 @@ void send_pack_data(const BMSOverallData_t *d)
     Serial.printf("Cell Temp (°C): min %.1f, max %.1f\n",
                   d->minCellTemp_C10/10.0f, d->maxCellTemp_C10/10.0f);
     Serial.printf("State of Charge  : %u %%\n", d->stateOfCharge_pct);
+    Serial.printf("Max Cell Volt    : %d mV\n", g_bmsData.maxCellVoltage_mV);
 
     // 3) Fault flags
     Serial.println("\n--- Fault Flags ---");
